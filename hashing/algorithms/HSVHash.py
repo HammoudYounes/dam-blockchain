@@ -20,8 +20,9 @@ def rgb_to_hsv(rgb):
     Convert an (H, W, 3) RGB array to HSV in Pillow's 0-255 convention.
     Accepts uint8 [0,255] or float [0,1]. Returns uint8 (H, W, 3).
     """
+    is_uint8 = rgb.dtype == np.uint8
     rgb = rgb.astype(np.float32)
-    if rgb.max() > 1.0:
+    if is_uint8:
         rgb = rgb / 255.0
 
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
@@ -55,8 +56,9 @@ def rgb_to_hsv(rgb):
 
 def rgb_to_intensity(rgb):
     """Luminance (L) channel used for the black test: L = 0.299R + 0.587G + 0.114B."""
+    is_float = rgb.dtype != np.uint8
     rgb = rgb.astype(np.float32)
-    if rgb.max() <= 1.0:
+    if is_float:
         rgb = rgb * 255.0
     r, g, b = rgb[..., 0], rgb[..., 1], rgb[..., 2]
     L = 0.299 * r + 0.587 * g + 0.114 * b
@@ -84,7 +86,7 @@ def hsv_hash(rgb, binbits=3):
     # colorful pixels: not black, not gray -> split into faint / bright saturation
     mask_colors = np.logical_and(~mask_black, ~mask_gray)
     mask_faint = np.logical_and(mask_colors, s < 256 * 2 // 3)
-    mask_bright = np.logical_and(mask_colors, s > 256 * 2 // 3)
+    mask_bright = np.logical_and(mask_colors, s >= 256 * 2 // 3)
 
     c = max(1, mask_colors.sum())
     hue_bins = np.linspace(0, 255, 6 + 1)
@@ -100,8 +102,7 @@ def hsv_hash(rgb, binbits=3):
 
     bitarray = []
     for val in values:
-        bitarray += [val // (2 ** (binbits - i - 1)) % 2 ** (binbits - i) > 0
-                     for i in range(binbits)]
+        bitarray += [(val >> (binbits - 1 - i)) & 1 for i in range(binbits)]
     return np.asarray(bitarray)
 
 
