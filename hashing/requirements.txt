@@ -7,3 +7,5 @@ eth-account
 pytest
 httpx
 python-multipart
+scipy
+matplotlib
