@@ -81,3 +81,6 @@ out/
 tmp/
 temp/
 .claude/
+.pytest_tmp/
+hashing/.pytest_tmp/
+hashing/pytest.ini
