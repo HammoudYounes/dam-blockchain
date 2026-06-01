@@ -94,3 +94,8 @@ hashing/data/own/images_variants/*
 # FAISS Indices
 *.bin
 faiss_index_*.json
+.pytest_tmp/
+
+# Pytest 
+hashing/.pytest_tmp/
+hashing/pytest.ini
