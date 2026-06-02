@@ -9,3 +9,8 @@ httpx
 python-multipart
 scipy
 matplotlib
+torch
+torchvision
+transformers
+accelerate
+faiss-cpu
