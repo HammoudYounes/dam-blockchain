@@ -7,17 +7,20 @@ Run from the hashing/ directory:
 """
 
 import csv
+import sys
 from itertools import combinations
 from pathlib import Path
 
 import numpy as np
 
+sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 from algorithms.ahash import compute, hamming_distance
 
 
 HASH_BITS = 64
-DATA_DIR = Path(__file__).resolve().parent / "data" / "own"
+DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "own"
 VARIANTS_CSV = DATA_DIR / "variants.csv"
+RESULTS_DIR = Path(__file__).resolve().parent.parent / "benchmark_results"
 
 _hash_cache = {}
 
@@ -118,6 +121,18 @@ def print_summary(title, result):
     print(f"  TP={result['tp']}  TN={result['tn']}  FP={result['fp']}  FN={result['fn']}")
 
 
+def per_transform_report(positives, threshold):
+    stats = {}
+    for orig, variant, transform in positives:
+        d = hamming_distance(get_hash(orig), get_hash(variant))
+        if transform not in stats:
+            stats[transform] = {"correct": 0, "total": 0, "distances": []}
+        stats[transform]["correct"] += int(d <= threshold)
+        stats[transform]["total"] += 1
+        stats[transform]["distances"].append(d)
+    return stats
+
+
 def main():
     print("=" * 78)
     print("aHash Benchmark - Hamming Threshold Sweep")
@@ -165,6 +180,73 @@ def main():
 
     full_recall_threshold = int(positive_distances.max())
     print_summary("FULL-RECALL THRESHOLD (covers every variant)", results[full_recall_threshold])
+
+    print("\n" + "=" * 70)
+    print(f"PER-TRANSFORMATION BREAKDOWN  (threshold = {best_accuracy['threshold']})")
+    print("-" * 70)
+    print(f"{'Transformation':<25} {'Correct':>8} {'Total':>7} "
+          f"{'Acc %':>7} {'Mean Dist':>10} {'Max Dist':>9}")
+    print("-" * 70)
+
+    transform_stats = per_transform_report(positives, best_accuracy["threshold"])
+    for transform, stats in sorted(transform_stats.items()):
+        dists = stats["distances"]
+        print(f"{transform:<25} {stats['correct']:>8} {stats['total']:>7} "
+              f"{stats['correct']/stats['total']*100:>7.1f} {np.mean(dists):>10.2f} {max(dists):>9}")
+
+    total_correct = sum(s["correct"] for s in transform_stats.values())
+    total_pairs = sum(s["total"] for s in transform_stats.values())
+    print("-" * 70)
+    print(f"{'TOTAL':<25} {total_correct:>8} {total_pairs:>7} "
+          f"{total_correct/total_pairs*100:>7.1f}")
+    print("=" * 70)
+
+    RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+
+    sweep_csv = RESULTS_DIR / "ahash_threshold_sweep.csv"
+    with open(sweep_csv, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            "threshold", "accuracy", "precision", "recall", "f1",
+            "tp", "tn", "fp", "fn", "best_accuracy", "best_f1"
+        ])
+        writer.writeheader()
+        for r in results:
+            writer.writerow({**r,
+                             "best_accuracy": r["threshold"] == best_accuracy["threshold"],
+                             "best_f1": r["threshold"] == best_f1["threshold"]})
+    print(f"\nThreshold sweep saved to : {sweep_csv}")
+
+    transform_csv = RESULTS_DIR / "ahash_per_transform.csv"
+    with open(transform_csv, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            "transformation", "correct", "total", "accuracy_pct", "mean_dist", "max_dist"
+        ])
+        writer.writeheader()
+        for transform, stats in sorted(transform_stats.items()):
+            dists = stats["distances"]
+            writer.writerow({
+                "transformation": transform,
+                "correct": stats["correct"],
+                "total": stats["total"],
+                "accuracy_pct": round(stats["correct"] / stats["total"] * 100, 2),
+                "mean_dist": round(float(np.mean(dists)), 4),
+                "max_dist": int(max(dists)),
+            })
+    print(f"Per-transform breakdown saved to : {transform_csv}")
+
+    pairs_csv = RESULTS_DIR / "ahash_pair_distances.csv"
+    with open(pairs_csv, "w", newline="") as f:
+        writer = csv.DictWriter(f, fieldnames=[
+            "image_a", "image_b", "label", "transformation", "hamming_distance"
+        ])
+        writer.writeheader()
+        for (o, v, t), d in zip(positives, positive_distances):
+            writer.writerow({"image_a": o, "image_b": v, "label": 1,
+                             "transformation": t, "hamming_distance": int(d)})
+        for (a, b, t), d in zip(negatives, negative_distances):
+            writer.writerow({"image_a": a, "image_b": b, "label": 0,
+                             "transformation": t, "hamming_distance": int(d)})
+    print(f"Pair distances saved to          : {pairs_csv}")
 
 
 if __name__ == "__main__":

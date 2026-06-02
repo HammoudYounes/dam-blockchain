@@ -1,0 +1,30 @@
+algorithm,algo_key,best_threshold,case_type,image_a,image_b,transformation,hamming_distance,label
+aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/covered.png,covered_30%,16,1
+aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,16,1
+aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,28,1
+aHash (Average Hash),ahash,9,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,14,1
+aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,30,1
+aHash (Average Hash),ahash,9,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
+aHash (Average Hash),ahash,9,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,16,1
+dHash (Difference Hash),dhash,29,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,30,1
+dHash (Difference Hash),dhash,29,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,31,1
+dHash (Difference Hash),dhash,29,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,30,1
+dHash (Difference Hash),dhash,29,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,31,1
+dHash (Difference Hash),dhash,29,false_positive,images/beach.jpg,images_variants/golden_bridge/cropped20.png,cross_image,28,0
+HSV Hash,hsv,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,4,false_negative,images/beach.jpg,images_variants/beach/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/contrasted.png,contrast_1.5x,8,1
+HSV Hash,hsv,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/contrasted.png,contrast_1.5x,5,1
+HSV Hash,hsv,4,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,6,1
+HSV Hash,hsv,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/grayscale.png,grayscale,5,1
+HSV Hash,hsv,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/grayscale.png,grayscale,5,1
+HSV Hash,hsv,4,false_positive,images/golden_bridge.webp,images_variants/dragon-bridge/channel_shifted.png,cross_image,4,0
+HSV Hash,hsv,4,false_positive,images/beach.jpg,images_variants/golden_bridge/grayscale.png,cross_image,4,0
+HSV Hash,hsv,4,false_positive,images/beach.jpg,images_variants/golden_bridge/brightened.png,cross_image,4,0
+pHash (Perceptual Hash),phash,22,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,29,1
+pHash (Perceptual Hash),phash,22,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,28,1
+pHash (Perceptual Hash),phash,22,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,38,1
+pHash (Perceptual Hash),phash,22,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,29,1
+pHash (Perceptual Hash),phash,22,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
+pHash (Perceptual Hash),phash,22,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,30,1

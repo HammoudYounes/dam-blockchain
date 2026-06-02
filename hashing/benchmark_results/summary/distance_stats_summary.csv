@@ -1,0 +1,9 @@
+algorithm,algo_key,class,n_pairs,mean,median,std,min,max,p25,p75,p95
+aHash (Average Hash),ahash,similar,54,4.0185,0.0,7.3111,0,30,0.0,4.0,19.5
+aHash (Average Hash),ahash,different,111,25.2252,29.0,8.117,10,41,14.5,31.0,34.0
+dHash (Difference Hash),dhash,similar,54,6.3704,1.5,10.1355,0,31,0.0,5.5,30.0
+dHash (Difference Hash),dhash,different,111,35.2613,36.0,2.2021,28,40,34.0,37.0,38.0
+HSV Hash,hsv,similar,54,1.8333,1.0,2.09,0,8,0.0,3.0,6.0
+HSV Hash,hsv,different,111,7.5495,8.0,1.3667,4,10,7.0,9.0,9.0
+pHash (Perceptual Hash),phash,similar,54,6.2963,1.0,10.1659,0,38,0.0,9.0,29.0
+pHash (Perceptual Hash),phash,different,111,32.7387,34.0,4.74,24,41,27.5,36.5,39.0
