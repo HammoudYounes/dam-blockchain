@@ -99,15 +99,3 @@ faiss_index_*.json
 # Pytest 
 hashing/.pytest_tmp/
 hashing/pytest.ini
-.pytest_tmp/
-
-# Dataset
-hashing/data/disc21/queries/*
-hashing/data/disc21/references/*
-hashing/data/own/images/*
-hashing/data/own/images_variants/*
-
-# FAISS Indices
-*.bin
-faiss_index_*.json
-
