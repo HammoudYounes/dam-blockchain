@@ -8,6 +8,7 @@ from transformers import AutoImageProcessor, AutoModel
 import sys
 import os
 import json
+from tqdm import tqdm
 
 
 class ImageRetriever:
@@ -102,13 +103,11 @@ class ImageRetriever:
         with open(csv_path, "r") as f:
             reader = csv.reader(f)
             next(reader)  # skip header
+            rows = list(reader)
 
-            for i, row in enumerate(reader):
+            for i, row in enumerate(tqdm(rows, desc="Indexing", total=len(rows))):
                 reference, query = row
                 ref_path = os.path.join(input_folder, "references", reference)
-
-                if i % 100 == 0:
-                    print(f"Processing {i} ...")
 
                 try:
                     embedding = self.get_image_embedding(ref_path)
@@ -126,7 +125,7 @@ class ImageRetriever:
         total_first_matches = 0
         total_top5_matches = 0
 
-        for i, (query, reference) in enumerate(self.query_references.items()):
+        for i, (query, reference) in enumerate(tqdm(self.query_references.items(), desc="Comparing queries", total=len(self.query_references))):
             query_path = os.path.join(input_folder, "queries", query)
 
             try:
@@ -145,9 +144,6 @@ class ImageRetriever:
                 if display_results and is_matched:
                     self._display(query_path, input_folder,
                                   reference, I, D, pause_time)
-
-                if i % 100 == 0:
-                    print(f"Compared {i} queries ...")
 
             except Exception as e:
                 print(f"  Error on query {query}: {e}")
