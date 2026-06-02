@@ -18,8 +18,10 @@ class ImageRetriever:
         model_size = model_size if model_size in self.MODEL_SIZES else self.DEFAULT_MODEL
         model_name = f"facebook/dinov2-{model_size}"
 
-        self.index_file = os.path.join(index_dir, f"faiss_index_{model_size}.bin")
-        self.meta_file  = os.path.join(index_dir, f"faiss_index_{model_size}.json")
+        self.index_file = os.path.join(
+            index_dir, f"faiss_index_{model_size}.bin")
+        self.meta_file = os.path.join(
+            index_dir, f"faiss_index_{model_size}.json")
 
         self.index_ids: dict[int, str] = {}
         self.query_references: dict[str, str] = {}
@@ -34,7 +36,8 @@ class ImageRetriever:
         self.image_processor = AutoImageProcessor.from_pretrained(model_name)
         self.model = AutoModel.from_pretrained(model_name)
         self.model.eval()
-        self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = torch.device(
+            "cuda" if torch.cuda.is_available() else "cpu")
         self.model = self.model.to(self.device)
 
         d = self.model.config.hidden_size
@@ -128,17 +131,20 @@ class ImageRetriever:
 
             try:
                 query_embedding = self.get_image_embedding(query_path)
-                D, I = self.index.search(np.array(query_embedding, dtype="float32"), k=5)
+                D, I = self.index.search(
+                    np.array(query_embedding, dtype="float32"), k=5)
 
                 if self.index_ids[I[0][0]] == reference:
                     total_first_matches += 1
 
-                is_matched = any(self.index_ids[I[0][rank]] == reference for rank in range(5))
-                if is_matched: 
+                is_matched = any(
+                    self.index_ids[I[0][rank]] == reference for rank in range(5))
+                if is_matched:
                     total_top5_matches += 1
 
                 if display_results and is_matched:
-                    self._display(query_path, input_folder, reference, I, D, pause_time)
+                    self._display(query_path, input_folder,
+                                  reference, I, D, pause_time)
 
                 if i % 100 == 0:
                     print(f"Compared {i} queries ...")
@@ -147,8 +153,10 @@ class ImageRetriever:
                 print(f"  Error on query {query}: {e}")
 
         n = len(self.query_references)
-        print(f"\nTop-1 accuracy : {total_first_matches / n * 100:.2f}%  ({total_first_matches}/{n})")
-        print(f"Top-5 accuracy : {total_top5_matches / n * 100:.2f}%  ({total_top5_matches}/{n})")
+        print(
+            f"\nTop-1 accuracy : {total_first_matches / n * 100:.2f}%  ({total_first_matches}/{n})")
+        print(
+            f"Top-5 accuracy : {total_top5_matches / n * 100:.2f}%  ({total_top5_matches}/{n})")
 
     def _display(self, query_path: str, input_folder: str, reference: str, I, D, pause_time: float):
         retrieved_ref = self.index_ids[I[0][0]]
@@ -182,8 +190,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     DATASET_FOLDER = sys.argv[1]
-    MODEL_SIZE   = sys.argv[2] if len(sys.argv) > 2 else "large"
-    CSV_NAME     = "filtered_ground_truth.csv"
+    MODEL_SIZE = sys.argv[2] if len(sys.argv) > 2 else "large"
+    CSV_NAME = "filtered_ground_truth.csv"
 
     retriever = ImageRetriever(model_size=MODEL_SIZE, index_dir=DATASET_FOLDER)
 
