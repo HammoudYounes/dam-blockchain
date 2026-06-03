@@ -17,6 +17,7 @@ class ImageRetriever:
 
     def __init__(self, model_size: str = None, index_dir: str = "."):
         model_size = model_size if model_size in self.MODEL_SIZES else self.DEFAULT_MODEL
+        self.model_size = model_size
         model_name = f"facebook/dinov2-{model_size}"
 
         self.index_file = os.path.join(
@@ -98,7 +99,7 @@ class ImageRetriever:
     #  Indexing                                                          #
     # ------------------------------------------------------------------ #
 
-    def index_folder(self, input_folder: str, csv_name: str):
+    def index_folder(self, input_folder: str, csv_name: str = "filtered_ground_truth.csv"):
         csv_path = os.path.join(input_folder, csv_name)
         with open(csv_path, "r") as f:
             reader = csv.reader(f)
@@ -121,25 +122,26 @@ class ImageRetriever:
     #  Evaluation                                                        #
     # ------------------------------------------------------------------ #
 
-    def evaluate(self, input_folder: str, pause_time: float = 1.0, display_results: bool = True):
-        total_first_matches = 0
-        total_top5_matches = 0
+    def evaluate(self, input_folder: str, pause_time: float = 1.0, display_results: bool = True, k: int = 5):
+        total_topk_matches = 0
+        total_match_disances = 0
 
-        for i, (query, reference) in enumerate(tqdm(self.query_references.items(), desc="Comparing queries", total=len(self.query_references))):
+        for _, (query, reference) in enumerate(tqdm(self.query_references.items(), desc="Comparing queries", total=len(self.query_references))):
             query_path = os.path.join(input_folder, "queries", query)
 
             try:
                 query_embedding = self.get_image_embedding(query_path)
                 D, I = self.index.search(
-                    np.array(query_embedding, dtype="float32"), k=5)
-
-                if self.index_ids[I[0][0]] == reference:
-                    total_first_matches += 1
+                    np.array(query_embedding, dtype="float32"), k=k)
 
                 is_matched = any(
-                    self.index_ids[I[0][rank]] == reference for rank in range(5))
+                    self.index_ids[I[0][rank]] == reference for rank in range(k))
                 if is_matched:
-                    total_top5_matches += 1
+                    total_topk_matches += 1
+                    for rank in range(k):
+                        if self.index_ids[I[0][rank]] == reference:
+                            total_match_disances += D[0][rank]
+                            break
 
                 if display_results and is_matched:
                     self._display(query_path, input_folder,
@@ -149,10 +151,12 @@ class ImageRetriever:
                 print(f"  Error on query {query}: {e}")
 
         n = len(self.query_references)
-        print(
-            f"\nTop-1 accuracy : {total_first_matches / n * 100:.2f}%  ({total_first_matches}/{n})")
-        print(
-            f"Top-5 accuracy : {total_top5_matches / n * 100:.2f}%  ({total_top5_matches}/{n})")
+        average_distance = total_match_disances / n 
+        match_rate = total_topk_matches / n
+        if display_results:
+            print(f"\nEvaluation completed: {total_topk_matches}/{n} matches (Top-{k} match rate: {match_rate:.2%})")
+            print(f"Average distance: {average_distance:.4f}")
+        return average_distance, match_rate
 
     def _display(self, query_path: str, input_folder: str, reference: str, I, D, pause_time: float):
         retrieved_ref = self.index_ids[I[0][0]]
@@ -172,7 +176,6 @@ class ImageRetriever:
         plt.tight_layout()
         plt.show(block=False)
         plt.pause(pause_time)
-        input("Press Enter to continue...")
         plt.close(fig)
 
 
@@ -187,13 +190,12 @@ if __name__ == "__main__":
 
     DATASET_FOLDER = sys.argv[1]
     MODEL_SIZE = sys.argv[2] if len(sys.argv) > 2 else "large"
-    CSV_NAME = "filtered_ground_truth.csv"
 
     retriever = ImageRetriever(model_size=MODEL_SIZE, index_dir=DATASET_FOLDER)
 
     if not retriever.load():
         print("No saved index found — indexing from scratch ...")
-        retriever.index_folder(DATASET_FOLDER, CSV_NAME)
+        retriever.index_folder(DATASET_FOLDER)
         retriever.save()
 
     retriever.evaluate(DATASET_FOLDER, pause_time=1.0, display_results=False)
