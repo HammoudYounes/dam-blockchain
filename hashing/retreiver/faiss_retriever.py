@@ -52,7 +52,7 @@ class ImageRetriever:
 
     def get_image_embedding(self, image_path: str) -> np.ndarray:
         try:
-            image = Image.open(image_path).convert("RGB")
+            image = Image.open(image_path).convert("RGB").resize((224, 224))
         except Exception as e:
             raise ValueError(f"Cannot open image {image_path}: {e}")
 
