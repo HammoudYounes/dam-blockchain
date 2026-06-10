@@ -28,3 +28,9 @@ pHash (Perceptual Hash),phash,22,false_negative,images/beach.jpg,images_variants
 pHash (Perceptual Hash),phash,22,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,29,1
 pHash (Perceptual Hash),phash,22,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
 pHash (Perceptual Hash),phash,22,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,30,1
+rHash (Radial Hash),rhash,16,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,20,1
+rHash (Radial Hash),rhash,16,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,18,1
+rHash (Radial Hash),rhash,16,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,22,1
+rHash (Radial Hash),rhash,16,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,31,1
+rHash (Radial Hash),rhash,16,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,20,1
+rHash (Radial Hash),rhash,16,false_positive,images/golden_bridge.webp,images_variants/beach/cropped30.png,cross_image,9,0
