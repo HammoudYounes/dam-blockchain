@@ -4,9 +4,9 @@ from PIL import Image
 IMAGE_SIZE = (32, 32) 
 S_MIN      = 25
 NUM_BINS   = 8
-BIN_WIDTH  = 256 // NUM_BINS   # 32 units per bin in PIL's 0-255 hue range
+BIN_WIDTH  = 256 // NUM_BINS
 
-_EMPTY_ZONE = -1  # sentinel: zone had no colorful (unmasked) pixels
+_EMPTY_ZONE = -1
 
 
 class CHash:
@@ -96,13 +96,12 @@ class CHash:
 
         mask = s_chan >= S_MIN
 
-        # Grayscale fallback: entire image has no meaningful hue signal
         self.is_fallback = not bool(np.any(mask))
         if self.is_fallback:
             return self._compute_fallback_hash(v_chan)
 
-        h_global = self._get_dominant_bin(h_chan, mask)         # always 0-7 here
-        global_mean_sat = s_chan[mask].mean()                   # safe: mask non-empty
+        h_global = self._get_dominant_bin(h_chan, mask)
+        global_mean_sat = s_chan[mask].mean()                   
 
         bits: list[str] = []
 
