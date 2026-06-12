@@ -1,19 +1,19 @@
-transformation,category,ahash_accuracy_pct,ahash_mean_dist,ahash_max_dist,dhash_accuracy_pct,dhash_mean_dist,dhash_max_dist,hsv_accuracy_pct,hsv_mean_dist,hsv_max_dist,phash_accuracy_pct,phash_mean_dist,phash_max_dist,best_algorithm,accuracy_spread
-quality_20%,compression,100.0,0.0,0,100.0,0.0,0,100.0,0.6667,2,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-quality_50%,compression,100.0,0.0,0,100.0,0.3333,1,100.0,0.6667,2,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-quality_80%,compression,100.0,0.0,0,100.0,0.6667,2,100.0,0.0,0,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-altered_20%,other,100.0,0.6667,2,100.0,1.3333,2,100.0,1.6667,2,100.0,0.6667,1,ahash / dhash / hsv / phash,0.0
-edge_filter,other,100.0,0.6667,2,100.0,1.0,2,100.0,1.0,2,100.0,2.3333,3,ahash / dhash / hsv / phash,0.0
-blur_radius_2,photometric,100.0,0.0,0,100.0,0.3333,1,100.0,1.0,2,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-brightened_1.5x,photometric,100.0,2.6667,3,100.0,3.0,4,100.0,2.3333,3,100.0,2.6667,3,ahash / dhash / hsv / phash,0.0
-channel_shift_1,photometric,100.0,2.0,3,100.0,3.0,6,0.0,6.0,6,100.0,2.3333,3,ahash / dhash / phash,100.0
-contrast_1.5x,photometric,100.0,1.3333,3,100.0,3.0,4,33.33,5.6667,8,100.0,1.6667,3,ahash / dhash / phash,66.67
-darkened_0.5x,photometric,100.0,0.0,0,100.0,1.3333,3,100.0,2.3333,4,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-grayscale,photometric,100.0,0.0,0,100.0,0.0,0,33.33,4.6667,5,100.0,0.0,0,ahash / dhash / phash,66.67
-resized_50%,resize,100.0,0.0,0,100.0,0.3333,1,100.0,0.6667,2,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-resized_up_200%,resize,100.0,0.0,0,100.0,0.3333,1,100.0,0.0,0,100.0,0.0,0,ahash / dhash / hsv / phash,0.0
-covered_30%,spatial,66.67,8.6667,16,100.0,5.0,10,100.0,0.3333,1,100.0,12.0,17,dhash / hsv / phash,33.33
-cropped_10%,spatial,66.67,9.3333,16,66.67,20.3333,30,100.0,0.0,0,66.67,20.0,29,hsv,33.33
-cropped_20%,spatial,33.33,17.0,28,66.67,27.0,31,100.0,1.3333,3,33.33,29.3333,38,hsv,66.67
-cropped_30%,spatial,0.0,24.0,30,33.33,29.3333,31,66.67,2.6667,6,0.0,28.3333,30,hsv,66.67
-grid_dropout_20%,spatial,100.0,6.0,8,100.0,18.3333,21,100.0,2.0,3,100.0,14.0,17,ahash / dhash / hsv / phash,0.0
+transformation,category,ahash_accuracy_pct,ahash_mean_dist,ahash_max_dist,dhash_accuracy_pct,dhash_mean_dist,dhash_max_dist,hsv_accuracy_pct,hsv_mean_dist,hsv_max_dist,phash_accuracy_pct,phash_mean_dist,phash_max_dist,chash_accuracy_pct,chash_mean_dist,chash_max_dist,best_algorithm,accuracy_spread
+quality_20%,compression,100.0,0.0,0,100.0,0.0,0,100.0,0.6667,2,100.0,0.0,0,100.0,0.6667,2,ahash / dhash / hsv / phash / chash,0.0
+quality_50%,compression,100.0,0.0,0,100.0,0.3333,1,100.0,0.6667,2,100.0,0.0,0,100.0,0.3333,1,ahash / dhash / hsv / phash / chash,0.0
+quality_80%,compression,100.0,0.0,0,100.0,0.6667,2,100.0,0.0,0,100.0,0.0,0,100.0,0.3333,1,ahash / dhash / hsv / phash / chash,0.0
+altered_20%,other,100.0,0.6667,2,100.0,1.3333,2,100.0,1.6667,2,100.0,0.6667,1,100.0,3.0,4,ahash / dhash / hsv / phash / chash,0.0
+edge_filter,other,100.0,0.6667,2,100.0,1.0,2,100.0,1.0,2,100.0,2.3333,3,100.0,1.0,2,ahash / dhash / hsv / phash / chash,0.0
+blur_radius_2,photometric,100.0,0.0,0,100.0,0.3333,1,100.0,1.0,2,100.0,0.0,0,100.0,0.3333,1,ahash / dhash / hsv / phash / chash,0.0
+brightened_1.5x,photometric,100.0,2.6667,3,100.0,3.0,4,100.0,2.3333,3,100.0,2.6667,3,66.67,6.6667,19,ahash / dhash / hsv / phash,33.33
+channel_shift_1,photometric,100.0,2.0,3,100.0,3.0,6,0.0,6.0,6,100.0,2.3333,3,100.0,8.6667,11,ahash / dhash / phash / chash,100.0
+contrast_1.5x,photometric,100.0,1.3333,3,100.0,3.0,4,33.33,5.6667,8,100.0,1.6667,3,100.0,1.3333,3,ahash / dhash / phash / chash,66.67
+darkened_0.5x,photometric,100.0,0.0,0,100.0,1.3333,3,100.0,2.3333,4,100.0,0.0,0,100.0,0.0,0,ahash / dhash / hsv / phash / chash,0.0
+grayscale,photometric,100.0,0.0,0,100.0,0.0,0,33.33,4.6667,5,100.0,0.0,0,0.0,64.0,64,ahash / dhash / phash,100.0
+resized_50%,resize,100.0,0.0,0,100.0,0.3333,1,100.0,0.6667,2,100.0,0.0,0,100.0,0.0,0,ahash / dhash / hsv / phash / chash,0.0
+resized_up_200%,resize,100.0,0.0,0,100.0,0.3333,1,100.0,0.0,0,100.0,0.0,0,100.0,0.0,0,ahash / dhash / hsv / phash / chash,0.0
+covered_30%,spatial,66.67,8.6667,16,100.0,5.0,10,100.0,0.3333,1,100.0,12.0,17,100.0,1.0,2,dhash / hsv / phash / chash,33.33
+cropped_10%,spatial,66.67,9.3333,16,66.67,20.3333,30,100.0,0.0,0,66.67,20.0,29,66.67,6.6667,14,hsv,33.33
+cropped_20%,spatial,33.33,17.0,28,66.67,27.0,31,100.0,1.3333,3,33.33,29.3333,38,66.67,11.3333,20,hsv,66.67
+cropped_30%,spatial,0.0,24.0,30,33.33,29.3333,31,66.67,2.6667,6,0.0,28.3333,30,66.67,10.6667,14,hsv / chash,66.67
+grid_dropout_20%,spatial,100.0,6.0,8,100.0,18.3333,21,100.0,2.0,3,100.0,14.0,17,100.0,1.0,2,ahash / dhash / hsv / phash / chash,0.0
