@@ -12,6 +12,8 @@ def ensure_dir(file_path):
         os.makedirs(directory)
 
 def benchmark_own(own_folder):
+    pass
+    """
     folder_reference = os.path.join(own_folder, "images")
     folder_altered = os.path.join(own_folder, "images_variants")
     csv_path = "../benchmark_results/n_own_benchmarks.csv"
@@ -44,12 +46,13 @@ def benchmark_own(own_folder):
                     similarity = img1.similarity(img2)
                     
                     f.write(f"{reference},{altered},{altered.split('.')[0]},{hamming_distance},{similarity:.03f}\n")
+    """
 
 def benchmark_disc21(disc21_folder):
     folder_queries = os.path.join(disc21_folder, "queries")
     folder_references = os.path.join(disc21_folder, "references")
     csv_ground_truth = os.path.join(disc21_folder, "filtered_ground_truth.csv")
-    csv_path = "../benchmark_results/n_disc21_benchmarks.csv"
+    csv_path = "../benchmark_results/chash_disc21_benchmarks.csv"
     ensure_dir(csv_path)
 
     # Use a cache to avoid re-hashing the same image multiple times (Massive Speed boost)
