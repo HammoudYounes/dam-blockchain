@@ -26,15 +26,14 @@ import sys
 from pathlib import Path
 
 import numpy as np
-from PIL import Image
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR.parent))
 
-from algorithms.ahash import compute as ahash_compute, hamming_distance as ahash_hamming
-from algorithms.phash import compute as phash_compute, hamming_distance as phash_hamming
-from algorithms.dhash import compute as dhash_compute, hamming_distance as dhash_hamming
-from algorithms.HSVHash import hsv_hash, hamming as hsv_hamming
+from algorithms.ahash import AverageHash
+from algorithms.phash import PerceptualHash
+from algorithms.dhash import DifferenceHash
+from algorithms.HSVHash import HSVColorHash
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 REPO_ROOT      = SCRIPT_DIR.parent.parent          # dam-blockchain/
@@ -47,63 +46,39 @@ RESULTS_DIR    = SCRIPT_DIR.parent / "benchmark_results"
 EXISTING_CSV   = RESULTS_DIR / "training_data.csv"
 OUTPUT_CSV     = RESULTS_DIR / "combined_training_data.csv"
 
-# ── Hash bit lengths (must match the algorithms) ───────────────────────────────
-AHASH_BITS = 64
-PHASH_BITS = 63
-DHASH_BITS = 72
-HSV_BITS   = 42
+# ── Hashers ───────────────────────────────────────────────────────────────────
+# The dict key is the CSV column prefix; each hasher carries its own HASH_BITS
+# used to normalise the Hamming distance.
+HASHERS = {
+    "ahash":   AverageHash(),
+    "phash":   PerceptualHash(),
+    "dhash":   DifferenceHash(),
+    "hsvhash": HSVColorHash(),
+}
 
 # How many negative pairs to generate per positive pair
 NEG_RATIO = 1
 
 RANDOM_SEED = 42
 
-# ── Per-image hash caches ─────────────────────────────────────────────────────
-_ahash_cache: dict[str, str]       = {}
-_phash_cache: dict[str, str]       = {}
-_dhash_cache: dict[str, str]       = {}
-_hsv_cache:   dict[str, np.ndarray] = {}
+# ── Per-image hash caches (one dict per algorithm) ────────────────────────────
+_caches: dict[str, dict[str, str]] = {name: {} for name in HASHERS}
 
 
-def _load_rgb(path: Path) -> np.ndarray:
-    return np.asarray(Image.open(path).convert("RGB"))
-
-
-def get_ahash(path: Path) -> str:
+def get_hash(algo: str, path: Path) -> str:
+    cache = _caches[algo]
     k = str(path)
-    if k not in _ahash_cache:
-        _ahash_cache[k] = ahash_compute(k)
-    return _ahash_cache[k]
-
-
-def get_phash(path: Path) -> str:
-    k = str(path)
-    if k not in _phash_cache:
-        _phash_cache[k] = phash_compute(k)
-    return _phash_cache[k]
-
-
-def get_dhash(path: Path) -> str:
-    k = str(path)
-    if k not in _dhash_cache:
-        _dhash_cache[k] = dhash_compute(k)
-    return _dhash_cache[k]
-
-
-def get_hsv(path: Path) -> np.ndarray:
-    k = str(path)
-    if k not in _hsv_cache:
-        _hsv_cache[k] = hsv_hash(_load_rgb(path))
-    return _hsv_cache[k]
+    if k not in cache:
+        cache[k] = HASHERS[algo].compute(k)
+    return cache[k]
 
 
 def compute_features(path_a: Path, path_b: Path) -> dict:
-    return {
-        "ahash_dist":   ahash_hamming(get_ahash(path_a), get_ahash(path_b)) / AHASH_BITS,
-        "phash_dist":   phash_hamming(get_phash(path_a), get_phash(path_b)) / PHASH_BITS,
-        "dhash_dist":   dhash_hamming(get_dhash(path_a), get_dhash(path_b)) / DHASH_BITS,
-        "hsvhash_dist": hsv_hamming(get_hsv(path_a),   get_hsv(path_b))   / HSV_BITS,
-    }
+    feats = {}
+    for algo, hasher in HASHERS.items():
+        dist = hasher.hamming_distance(get_hash(algo, path_a), get_hash(algo, path_b))
+        feats[f"{algo}_dist"] = dist / hasher.HASH_BITS
+    return feats
 
 
 # ── Load ground truth ─────────────────────────────────────────────────────────

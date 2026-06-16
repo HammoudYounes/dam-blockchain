@@ -9,6 +9,7 @@ Run from the hashing/ directory:
     pytest tests/test_hsvhash.py -v
 """
 
+import io
 import os
 import sys
 
@@ -17,7 +18,13 @@ import pytest
 from PIL import Image, ImageEnhance, ImageFilter
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from algorithms.HSVHash import hsv_hash, hamming, hash_to_hex, rgb_to_hsv, rgb_to_intensity
+from algorithms.HSVHash import HSVColorHash
+
+hsv_hash = HSVColorHash.hsv_hash
+hamming = HSVColorHash.hamming
+hash_to_hex = HSVColorHash.hash_to_hex
+rgb_to_hsv = HSVColorHash.rgb_to_hsv
+rgb_to_intensity = HSVColorHash.rgb_to_intensity
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -314,16 +321,64 @@ class TestRobustness:
         )
         assert dist <= self.ROBUST_THRESHOLD
 
-    def test_jpeg_compression(self, gradient_arr, tmp_path_factory):
+    def test_jpeg_compression(self, gradient_arr):
         """Low-quality JPEG recompression must not exceed the robust threshold."""
-        jpeg_path = str(tmp_path_factory.mktemp("jpeg") / "compressed.jpg")
-        Image.fromarray(gradient_arr, mode="RGB").save(jpeg_path, "JPEG", quality=20)
-        h2 = hsv_hash(np.asarray(Image.open(jpeg_path).convert("RGB")))
+        buf = io.BytesIO()
+        Image.fromarray(gradient_arr, mode="RGB").save(buf, "JPEG", quality=20)
+        buf.seek(0)
+        h2 = hsv_hash(np.asarray(Image.open(buf).convert("RGB")))
         assert hamming(hsv_hash(gradient_arr), h2) <= self.ROBUST_THRESHOLD
 
-    def test_lossless_roundtrip_is_identical(self, gradient_arr, tmp_path_factory):
+    def test_lossless_roundtrip_is_identical(self, gradient_arr):
         """PNG save/reload must reproduce the exact same hash."""
-        png_path = tmp_path_factory.mktemp("png") / "copy.png"
-        Image.fromarray(gradient_arr, mode="RGB").save(png_path)
-        h2 = hsv_hash(np.asarray(Image.open(png_path).convert("RGB")))
+        buf = io.BytesIO()
+        Image.fromarray(gradient_arr, mode="RGB").save(buf, "PNG")
+        buf.seek(0)
+        h2 = hsv_hash(np.asarray(Image.open(buf).convert("RGB")))
         assert hamming(hsv_hash(gradient_arr), h2) == 0
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SECTION 7 — HSVColorHash (ImageHasher adapter)
+# ══════════════════════════════════════════════════════════════════════════════
+
+
+class TestHSVColorHash:
+    """Tests for the class adapter that exposes the common ImageHasher API."""
+
+    def test_compute_returns_binary_string(self, red_arr):
+        h = HSVColorHash().compute(Image.fromarray(red_arr, mode="RGB"))
+        assert isinstance(h, str)
+        assert all(c in ("0", "1") for c in h)
+
+    def test_default_hash_bits_is_42(self):
+        hasher = HSVColorHash()
+        assert hasher.HASH_BITS == 42
+        h = hasher.compute(Image.fromarray(_solid(0, 128, 255), mode="RGB"))
+        assert len(h) == 42
+
+    def test_custom_binbits(self):
+        hasher = HSVColorHash(binbits=4)
+        assert hasher.HASH_BITS == 56
+        assert len(hasher.compute(Image.fromarray(_solid(0, 128, 255), mode="RGB"))) == 56
+
+    def test_matches_underlying_hsv_hash(self, gradient_arr):
+        """The adapter must encode exactly what hsv_hash() produces."""
+        expected = "".join(str(int(b)) for b in hsv_hash(gradient_arr))
+        got = HSVColorHash().compute(Image.fromarray(gradient_arr, mode="RGB"))
+        assert got == expected
+
+    def test_similarity_identical_is_one(self, red_arr):
+        hasher = HSVColorHash()
+        h = hasher.compute(Image.fromarray(red_arr, mode="RGB"))
+        assert hasher.similarity(h, h) == 1.0
+
+    def test_different_colors_differ(self, red_arr, blue_arr):
+        hasher = HSVColorHash()
+        h_red = hasher.compute(Image.fromarray(red_arr, mode="RGB"))
+        h_blue = hasher.compute(Image.fromarray(blue_arr, mode="RGB"))
+        assert hasher.hamming_distance(h_red, h_blue) > 0
+
+    def test_invalid_type_raises(self):
+        with pytest.raises(TypeError):
+            HSVColorHash().compute(42)
