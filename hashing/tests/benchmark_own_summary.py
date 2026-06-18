@@ -32,14 +32,15 @@ import numpy as np
 # Configuration
 # ---------------------------------------------------------------------------
 
-ALGORITHMS = ["ahash", "dhash", "hsv", "phash","rhash"]
+ALGORITHMS = ["ahash", "dhash", "hsv", "phash","rhash", "chash"]  
 
 ALGORITHM_LABELS = {
     "ahash": "aHash (Average Hash)",
     "dhash": "dHash (Difference Hash)",
     "hsv":   "HSV Hash",
     "phash": "pHash (Perceptual Hash)",
-    "rhash": "rHash (Radial Hash)"
+    "rhash": "rHash (Radial Hash)",
+    "chash": "CHash (Spatial Color Hash)",
 }
 
 # Transformations that operate in the spatial domain — useful for the paper

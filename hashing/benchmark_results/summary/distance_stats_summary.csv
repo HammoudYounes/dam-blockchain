@@ -9,3 +9,5 @@ pHash (Perceptual Hash),phash,similar,54,6.2963,1.0,10.1659,0,38,0.0,9.0,29.0
 pHash (Perceptual Hash),phash,different,111,32.7387,34.0,4.74,24,41,27.5,36.5,39.0
 rHash (Radial Hash),rhash,similar,54,5.463,2.5,7.358,0,31,0.0,7.0,20.0
 rHash (Radial Hash),rhash,different,111,30.8649,34.0,7.429,9,49,22.5,37.0,40.0
+CHash (Spatial Color Hash),chash,similar,54,6.5,1.0,14.8981,0,64,0.0,5.0,35.4
+CHash (Spatial Color Hash),chash,different,111,23.3153,20.0,11.3514,11,64,15.5,28.0,49.5
