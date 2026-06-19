@@ -1,4 +1,5 @@
 import csv
+import io
 import os
 import sys
 from itertools import combinations
@@ -9,7 +10,12 @@ import pytest
 from PIL import Image, ImageEnhance, ImageFilter
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from algorithms.ahash import compute, hamming_distance, similarity
+from algorithms.ahash import AverageHash
+
+_hasher = AverageHash()
+compute = _hasher.compute
+hamming_distance = AverageHash.hamming_distance
+similarity = AverageHash.similarity
 
 
 HASH_BITS = 64
@@ -19,42 +25,34 @@ VARIANTS_CSV = DATASET_DIR / "variants.csv"
 
 
 @pytest.fixture(scope="module")
-def gradient_image(tmp_path_factory):
-    """256x256 horizontal gradient."""
-    path = str(tmp_path_factory.mktemp("images") / "gradient.png")
+def gradient_image():
+    """256x256 horizontal gradient (in-memory PIL image)."""
     arr = np.tile(np.arange(256, dtype=np.uint8), (256, 1))
-    Image.fromarray(arr, mode="L").save(path)
-    return path
+    return Image.fromarray(arr, mode="L")
 
 
 @pytest.fixture(scope="module")
-def white_image(tmp_path_factory):
+def white_image():
     """256x256 solid white image."""
-    path = str(tmp_path_factory.mktemp("images") / "white.png")
     arr = np.full((256, 256), 255, dtype=np.uint8)
-    Image.fromarray(arr, mode="L").save(path)
-    return path
+    return Image.fromarray(arr, mode="L")
 
 
 @pytest.fixture(scope="module")
-def noise_image(tmp_path_factory):
+def noise_image():
     """256x256 random noise image."""
-    path = str(tmp_path_factory.mktemp("images") / "noise.png")
     rng = np.random.default_rng(42)
     arr = rng.integers(0, 256, size=(256, 256), dtype=np.uint8)
-    Image.fromarray(arr, mode="L").save(path)
-    return path
+    return Image.fromarray(arr, mode="L")
 
 
 @pytest.fixture(scope="module")
-def color_image(tmp_path_factory):
+def color_image():
     """256x256 RGB image with a diagonal gradient."""
-    path = str(tmp_path_factory.mktemp("images") / "color.png")
     r = np.tile(np.arange(256, dtype=np.uint8), (256, 1))
     g = np.tile(np.arange(255, -1, -1, dtype=np.uint8), (256, 1))
     b = np.fromfunction(lambda y, x: ((x + y) / 2) % 256, (256, 256)).astype(np.uint8)
-    Image.fromarray(np.stack([r, g, b], axis=-1), mode="RGB").save(path)
-    return path
+    return Image.fromarray(np.stack([r, g, b], axis=-1), mode="RGB")
 
 
 def _load_dataset_pairs():
@@ -133,8 +131,7 @@ class TestCompute:
         assert compute(gradient_image) == compute(gradient_image)
 
     def test_accepts_pil_image(self, gradient_image):
-        img = Image.open(gradient_image)
-        assert compute(gradient_image) == compute(img)
+        assert compute(gradient_image) == compute(gradient_image.copy())
 
     def test_accepts_rgb_input(self, color_image):
         assert len(compute(color_image)) == HASH_BITS
@@ -202,8 +199,8 @@ class TestSimilarity:
 class TestSyntheticRobustness:
     ROBUST_THRESHOLD = 10
 
-    def _transform_and_compare(self, image_path, transform_fn):
-        original = Image.open(image_path)
+    def _transform_and_compare(self, image, transform_fn):
+        original = image
         transformed = transform_fn(original)
         h1 = compute(original)
         h2 = compute(transformed)
@@ -248,16 +245,16 @@ class TestSyntheticRobustness:
         )
         assert dist <= self.ROBUST_THRESHOLD
 
-    def test_jpeg_compression(self, gradient_image, tmp_path_factory):
-        jpeg_path = str(tmp_path_factory.mktemp("jpeg") / "compressed.jpg")
-        img = Image.open(gradient_image).convert("RGB")
-        img.save(jpeg_path, "JPEG", quality=20)
+    def test_jpeg_compression(self, gradient_image):
+        buf = io.BytesIO()
+        gradient_image.convert("RGB").save(buf, "JPEG", quality=20)
+        buf.seek(0)
         h1 = compute(gradient_image)
-        h2 = compute(jpeg_path)
+        h2 = compute(Image.open(buf))
         assert hamming_distance(h1, h2) <= self.ROBUST_THRESHOLD
 
     def test_grayscale_conversion(self, color_image):
-        img = Image.open(color_image)
+        img = color_image
         gray = img.convert("L")
         h1 = compute(img)
         h2 = compute(gray)

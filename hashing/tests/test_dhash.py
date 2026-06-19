@@ -8,6 +8,7 @@ Run from the hashing/ directory:
     pytest tests/test_dhash.py -v
 """
 
+import io
 import os
 import sys
 
@@ -16,7 +17,12 @@ import pytest
 from PIL import Image, ImageEnhance, ImageFilter
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from algorithms.dhash import compute, hamming_distance, similarity
+from algorithms.dhash import DifferenceHash
+
+_hasher = DifferenceHash()
+compute = _hasher.compute
+hamming_distance = DifferenceHash.hamming_distance
+similarity = DifferenceHash.similarity
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -25,42 +31,34 @@ from algorithms.dhash import compute, hamming_distance, similarity
 
 
 @pytest.fixture(scope="module")
-def gradient_image(tmp_path_factory):
+def gradient_image():
     """256×256 horizontal gradient — a realistic luminance pattern."""
-    path = str(tmp_path_factory.mktemp("images") / "gradient.png")
     arr = np.tile(np.arange(256, dtype=np.uint8), (256, 1))
-    Image.fromarray(arr, mode="L").save(path)
-    return path
+    return Image.fromarray(arr, mode="L")
 
 
 @pytest.fixture(scope="module")
-def white_image(tmp_path_factory):
+def white_image():
     """256×256 solid white image."""
-    path = str(tmp_path_factory.mktemp("images") / "white.png")
     arr = np.full((256, 256), 255, dtype=np.uint8)
-    Image.fromarray(arr, mode="L").save(path)
-    return path
+    return Image.fromarray(arr, mode="L")
 
 
 @pytest.fixture(scope="module")
-def noise_image(tmp_path_factory):
+def noise_image():
     """256×256 random noise — structurally unrelated to gradient."""
-    path = str(tmp_path_factory.mktemp("images") / "noise.png")
     rng = np.random.default_rng(42)
     arr = rng.integers(0, 256, size=(256, 256), dtype=np.uint8)
-    Image.fromarray(arr, mode="L").save(path)
-    return path
+    return Image.fromarray(arr, mode="L")
 
 
 @pytest.fixture(scope="module")
-def color_image(tmp_path_factory):
+def color_image():
     """256×256 RGB image with a diagonal gradient — tests color input."""
-    path = str(tmp_path_factory.mktemp("images") / "color.png")
     r = np.tile(np.arange(256, dtype=np.uint8), (256, 1))
     g = np.tile(np.arange(255, -1, -1, dtype=np.uint8), (256, 1))
     b = np.fromfunction(lambda y, x: ((x + y) / 2) % 256, (256, 256)).astype(np.uint8)
-    Image.fromarray(np.stack([r, g, b], axis=-1), mode="RGB").save(path)
-    return path
+    return Image.fromarray(np.stack([r, g, b], axis=-1), mode="RGB")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -86,8 +84,7 @@ class TestCompute:
         assert compute(gradient_image) == compute(gradient_image)
 
     def test_accepts_pil_image(self, gradient_image):
-        img = Image.open(gradient_image)
-        assert compute(gradient_image) == compute(img)
+        assert compute(gradient_image) == compute(gradient_image.copy())
 
     def test_accepts_rgb_input(self, color_image):
         h = compute(color_image)
@@ -181,9 +178,9 @@ class TestRobustness:
 
     ROBUST_THRESHOLD = 10  # max acceptable distance for these transforms
 
-    def _transform_and_compare(self, image_path, transform_fn):
+    def _transform_and_compare(self, image, transform_fn):
         """Apply a transform via PIL, compute both hashes, return distance."""
-        original = Image.open(image_path)
+        original = image
         transformed = transform_fn(original)
         h1 = compute(original)
         h2 = compute(transformed)
@@ -225,18 +222,18 @@ class TestRobustness:
         )
         assert dist <= self.ROBUST_THRESHOLD
 
-    def test_jpeg_compression(self, gradient_image, tmp_path_factory):
+    def test_jpeg_compression(self, gradient_image):
         """Save as low-quality JPEG, reload, compare."""
-        jpeg_path = str(tmp_path_factory.mktemp("jpeg") / "compressed.jpg")
-        img = Image.open(gradient_image).convert("RGB")
-        img.save(jpeg_path, "JPEG", quality=20)
+        buf = io.BytesIO()
+        gradient_image.convert("RGB").save(buf, "JPEG", quality=20)
+        buf.seek(0)
         h1 = compute(gradient_image)
-        h2 = compute(jpeg_path)
+        h2 = compute(Image.open(buf))
         assert hamming_distance(h1, h2) <= self.ROBUST_THRESHOLD
 
     def test_grayscale_conversion(self, color_image):
         """Converting an RGB image to grayscale should not change its hash."""
-        img = Image.open(color_image)
+        img = color_image
         gray = img.convert("L")
         h1 = compute(img)
         h2 = compute(gray)

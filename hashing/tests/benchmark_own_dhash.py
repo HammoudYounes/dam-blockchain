@@ -19,7 +19,11 @@ VARIANTS_CSV = DATA_DIR / "variants.csv"
 RESULTS_DIR = SCRIPT_DIR.parent / "benchmark_results"
 
 sys.path.insert(0, str(SCRIPT_DIR.parent))
-from algorithms.dhash import compute, hamming_distance
+from algorithms.dhash import DifferenceHash
+
+_hasher = DifferenceHash()
+compute = _hasher.compute
+hamming_distance = DifferenceHash.hamming_distance
 
 HASH_BITS = 72  # 9×8 horizontal gradients
 

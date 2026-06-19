@@ -30,7 +30,10 @@ VARIANTS_CSV = DATA_DIR / "variants.csv"
 RESULTS_DIR = SCRIPT_DIR.parent / "benchmark_results"
 
 sys.path.insert(0, str(SCRIPT_DIR.parent / "algorithms"))
-from HSVHash import hsv_hash, hamming
+from HSVHash import HSVColorHash
+
+hsv_hash = HSVColorHash.hsv_hash
+hamming = HSVColorHash.hamming
 
 MAX_BITS = 42  # 14 bins × 3 binbits
 
