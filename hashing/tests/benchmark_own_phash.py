@@ -19,7 +19,11 @@ VARIANTS_CSV = DATA_DIR / "variants.csv"
 RESULTS_DIR = SCRIPT_DIR.parent / "benchmark_results"
 
 sys.path.insert(0, str(SCRIPT_DIR.parent))
-from algorithms.phash import compute, hamming_distance
+from algorithms.phash import PerceptualHash
+
+_hasher = PerceptualHash()
+compute = _hasher.compute
+hamming_distance = PerceptualHash.hamming_distance
 
 HASH_BITS = 63  # 8×8 DCT low-freq block minus the DC component
 

@@ -14,7 +14,11 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from algorithms.ahash import compute, hamming_distance
+from algorithms.ahash import AverageHash
+
+_hasher = AverageHash()
+compute = _hasher.compute
+hamming_distance = AverageHash.hamming_distance
 
 
 HASH_BITS = 64
