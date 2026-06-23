@@ -2,12 +2,14 @@
 Collect training data for logistic regression combining all hash algorithms.
 
 For every pair (img_A, img_B) — both positive (duplicate) and negative (non-duplicate) —
-compute the four normalised Hamming distances and write one row to a CSV:
+compute the six normalised Hamming distances and write one row to a CSV:
 
     ahash_dist   = hamming(aHash_A,   aHash_B)   / 64
     phash_dist   = hamming(pHash_A,   pHash_B)   / 63
     dhash_dist   = hamming(dHash_A,   dHash_B)   / 72
     hsvhash_dist = hamming(HSVHash_A, HSVHash_B) / 42
+    rhash_dist   = hamming(rHash_A,   rHash_B)   / 64
+    chash_dist   = hamming(cHash_A,   cHash_B)   / 64
     label        = 1 (duplicate) | 0 (non-duplicate)
 
 Output: hashing/benchmark_results/training_data.csv 
@@ -30,6 +32,8 @@ from algorithms.ahash import AverageHash
 from algorithms.phash import PerceptualHash
 from algorithms.dhash import DifferenceHash
 from algorithms.HSVHash import HSVColorHash
+from algorithms.rhash import RadialHash
+from algorithms.Chash import ColorHash
 
 DATA_DIR = SCRIPT_DIR.parent / "data" / "own"
 VARIANTS_CSV = DATA_DIR / "variants.csv"
@@ -43,6 +47,8 @@ HASHERS = {
     "phash":   PerceptualHash(),
     "dhash":   DifferenceHash(),
     "hsvhash": HSVColorHash(),
+    "rhash":   RadialHash(),
+    "chash":   ColorHash(),
 }
 
 
@@ -126,6 +132,7 @@ def main():
     fieldnames = [
         "image_a", "image_b", "transformation", "label",
         "ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist",
+        "rhash_dist", "chash_dist",
     ]
 
     rows = []
@@ -160,7 +167,8 @@ def main():
     print("\nMean normalised distances by class:")
     print(f"{'Algorithm':<14} {'Positive (dup)':>15} {'Negative (non-dup)':>19}")
     print("-" * 52)
-    for col in ("ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist"):
+    for col in ("ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist",
+                "rhash_dist", "chash_dist"):
         pos_mean = np.mean([r[col] for r in pos_rows])
         neg_mean = np.mean([r[col] for r in neg_rows])
         print(f"{col:<14} {pos_mean:>15.4f} {neg_mean:>19.4f}")
