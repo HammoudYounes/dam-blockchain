@@ -2,7 +2,9 @@ from __future__ import annotations
 import numpy as np
 from PIL import Image
 
-IMAGE_SIZE = (32, 32) 
+from algorithms.base import ImageHasher
+
+IMAGE_SIZE = (32, 32)
 S_MIN      = 25
 NUM_BINS   = 8
 BIN_WIDTH  = 256 // NUM_BINS
@@ -142,3 +144,35 @@ class CHash:
 
     def similarity(self, other: CHash) -> float:
         return 1.0 - self.hamming_distance(other) / 64.0
+
+
+class ColorHash(ImageHasher):
+    """
+    Spatial color hash exposed through the common ImageHasher interface
+    (compute -> bitstring, HASH_BITS, hamming_distance / similarity), so it
+    slots into the combined feature collectors alongside aHash/pHash/etc.
+
+    Wraps :class:`CHash`. ``compute`` returns a 65-character string: a leading
+    mode marker ("C" = color, "F" = grayscale fallback) followed by the 64-bit
+    hash. ``hamming_distance`` preserves CHash's contract that comparing a
+    color-mode hash against a fallback-mode hash is meaningless and therefore
+    returns the maximum distance (64).
+    """
+
+    HASH_BITS = 64
+
+    def compute(self, image_input) -> str:
+        ch = CHash(image_input)
+        marker = "F" if ch.is_fallback else "C"
+        return marker + format(ch.hash_int, "064b")
+
+    @staticmethod
+    def hamming_distance(hash_a, hash_b):
+        # First char is the mode marker; differing modes -> max distance.
+        if hash_a[0] != hash_b[0]:
+            return 64
+        return sum(a != b for a, b in zip(hash_a[1:], hash_b[1:]))
+
+    @classmethod
+    def similarity(cls, hash_a, hash_b):
+        return 1.0 - cls.hamming_distance(hash_a, hash_b) / cls.HASH_BITS
