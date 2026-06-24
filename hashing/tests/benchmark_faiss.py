@@ -9,7 +9,7 @@ from time import time
 sys.path.insert(0,
                 os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from retreiver.faiss_retriever import ImageRetriever
+from retriever.faiss_retriever import ImageRetriever
 
 K_VALUES = [1, 3, 5, 10, 20, 50, 100]
 

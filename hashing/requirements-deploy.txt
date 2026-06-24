@@ -1,0 +1,15 @@
+# Core ML
+torch
+torchvision
+transformers
+faiss-cpu
+numpy
+Pillow
+
+# Utilities
+tqdm
+
+# Api
+fastapi[standard]
+uvicorn
+python-multipart

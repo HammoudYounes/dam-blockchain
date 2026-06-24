@@ -17,7 +17,7 @@ import torch
 
 sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-from retreiver.faiss_retriever import ImageRetriever 
+from retriever.faiss_retriever import ImageRetriever 
 
 EMB_DIM = 384  # matches dinov2-small hidden size
 
@@ -55,8 +55,8 @@ def tmp_dir():
 def retriever(tmp_dir):
     """ImageRetriever with all heavy dependencies mocked out."""
     with (
-        patch("retreiver.faiss_retriever.AutoImageProcessor.from_pretrained", return_value=_make_mock_processor()),
-        patch("retreiver.faiss_retriever.AutoModel.from_pretrained", return_value=_make_mock_model()),
+        patch("retriever.faiss_retriever.AutoImageProcessor.from_pretrained", return_value=_make_mock_processor()),
+        patch("retriever.faiss_retriever.AutoModel.from_pretrained", return_value=_make_mock_model()),
     ):
         yield ImageRetriever(model_size="small", index_dir=tmp_dir)
 
@@ -71,8 +71,8 @@ class TestInit:
 
     def test_invalid_model_size_falls_back_to_default(self, tmp_dir):
         with (
-            patch("retreiver.faiss_retriever.AutoImageProcessor.from_pretrained", return_value=_make_mock_processor()),
-            patch("retreiver.faiss_retriever.AutoModel.from_pretrained", return_value=_make_mock_model()),
+            patch("retriever.faiss_retriever.AutoImageProcessor.from_pretrained", return_value=_make_mock_processor()),
+            patch("retriever.faiss_retriever.AutoModel.from_pretrained", return_value=_make_mock_model()),
         ):
             r = ImageRetriever(model_size="xlarge", index_dir=tmp_dir)
             assert r.model_size == ImageRetriever.DEFAULT_MODEL
@@ -132,8 +132,8 @@ class TestPersistence:
         retriever.save()
 
         with (
-            patch("retreiver.faiss_retriever.AutoImageProcessor.from_pretrained", return_value=_make_mock_processor()),
-            patch("retreiver.faiss_retriever.AutoModel.from_pretrained", return_value=_make_mock_model()),
+            patch("retriever.faiss_retriever.AutoImageProcessor.from_pretrained", return_value=_make_mock_processor()),
+            patch("retriever.faiss_retriever.AutoModel.from_pretrained", return_value=_make_mock_model()),
         ):
             r2 = ImageRetriever(model_size="small", index_dir=tmp_dir)
             assert r2.load() is True
