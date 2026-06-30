@@ -19,6 +19,7 @@ class ImageRetriever:
         if not self.index.load():
             print("No saved index found — indexing from scratch ...")
             csv_path = os.path.join(self.dataset_dir, "filtered_ground_truth.csv")
+            print(f"Checking for CSV at: {csv_path} (exists: {os.path.exists(csv_path)})")
             if os.path.exists(csv_path):
                 self.index_folder(self.dataset_dir)
                 self.index.save()
@@ -32,7 +33,7 @@ class ImageRetriever:
             next(reader)
             rows = list(reader)
             for row in tqdm(rows, desc="Indexing"):
-                reference, query = row
+                reference, query, source = row
                 ref_path = os.path.join(input_folder, "references", reference)
                 try:
                     embedding = self.embedder.get_embedding_from_path(ref_path)
@@ -64,15 +65,33 @@ class ImageRetriever:
         self.index.remove_ids(np.array([image_id], dtype=np.int64))
         return True
 
+    def get_image_by_name(self, image_name: str):
+        POSSIBLE_PATHS = [
+            os.path.join(self.dataset_dir, "references", image_name),
+            os.path.join(self.dataset_dir, "new", image_name)
+        ]
+        for path in POSSIBLE_PATHS:
+            if os.path.exists(path):
+                return path 
+        return None
+    
     def get_similar_images(self, query_image_path: str, k: int = 5):
         embedding = self.embedder.get_embedding_from_path(query_image_path)
         D, I = self.index.search(embedding, k=k)
-        return [(self.index.index_ids[int(idx)], float(dist)) for idx, dist in zip(I[0], D[0])]
+        return [
+            (self.index.index_ids[int(idx)], float(dist)) 
+            for idx, dist in zip(I[0], D[0]) 
+            if idx != -1
+        ]
 
     def get_similar_images_from_bytes(self, image_bytes: bytes, k: int = 5):
         embedding = self.embedder.get_embedding_from_bytes(image_bytes)
         D, I = self.index.search(embedding, k=k)
-        return [(self.index.index_ids[int(idx)], float(dist)) for idx, dist in zip(I[0], D[0])]
+        return [
+            (self.index.index_ids[int(idx)], float(dist)) 
+            for idx, dist in zip(I[0], D[0]) 
+            if idx != -1
+        ]
 
     def evaluate(self, input_folder: str, pause_time: float = 1.0, display_results: bool = True, k: int = 5):
         total_topk_matches = 0

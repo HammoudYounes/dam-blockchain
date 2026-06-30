@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import io
+from pathlib import Path
 import numpy as np
 from PIL import Image
 
@@ -7,7 +9,11 @@ class ImageHasher(ABC):
 
     @staticmethod
     def _to_pil(image_input):
-        """Accept a file path or a PIL image and return a PIL image."""
+        """Accept image bytes, a file path, or a PIL image and return a PIL image."""
+        if isinstance(image_input, (bytes, bytearray)):
+            return Image.open(io.BytesIO(image_input))
+        if isinstance(image_input, Path):
+            return Image.open(image_input)
         if isinstance(image_input, str):
             return Image.open(image_input)
         if isinstance(image_input, Image.Image):

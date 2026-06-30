@@ -5,6 +5,7 @@ transformers
 faiss-cpu
 numpy
 Pillow
+scipy
 
 # Utilities
 tqdm

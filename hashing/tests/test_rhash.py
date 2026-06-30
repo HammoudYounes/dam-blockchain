@@ -16,8 +16,22 @@ import pytest
 from PIL import Image, ImageEnhance, ImageFilter
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from algorithms.rhash import compute, hamming_distance, similarity
+from algorithms.rhash import RadialHash
 
+# Use an instance of RadialHash
+rhash = RadialHash()
+
+def compute(img):
+    # Returns bitstring, convert to bool array for existing tests
+    bitstring = rhash.compute(img)
+    return np.array([b == '1' for b in bitstring])
+
+# Use ImageHasher methods for distance/similarity
+def hamming_distance(h1, h2):
+    return rhash.hamming_distance(rhash._to_bitstring(h1), rhash._to_bitstring(h2))
+
+def similarity(h1, h2):
+    return rhash.similarity(rhash._to_bitstring(h1), rhash._to_bitstring(h2))
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIXTURES — synthetic test images

@@ -13,6 +13,8 @@ accelerate
 faiss-cpu
 tqdm
 pandas
+scikit-learn
+joblib
 
 # Api
 fastapi[standard]

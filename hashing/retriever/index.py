@@ -33,6 +33,7 @@ class VectorIndex:
 
     def save(self):
         os.makedirs(os.path.dirname(self.index_file), exist_ok=True)
+        os.makedirs(os.path.dirname(self.meta_file), exist_ok=True)
         faiss.write_index(self.index, self.index_file)
         with open(self.meta_file, "w") as f:
             json.dump({
@@ -42,9 +43,14 @@ class VectorIndex:
             }, f)
 
     def load(self) -> bool:
-        if not (os.path.exists(self.index_file) and os.path.exists(self.meta_file)):
+        index_path = self.index_file
+        if not os.path.exists(index_path):
+            index_path = os.path.join(os.path.dirname(index_path), "index", os.path.basename(index_path))
+
+        if not (os.path.exists(index_path) and os.path.exists(self.meta_file)):
             return False
-        self.index = faiss.read_index(self.index_file)
+            
+        self.index = faiss.read_index(index_path)
         if not isinstance(self.index, faiss.IndexIDMap):
             self.index = faiss.IndexIDMap(self.index)
         with open(self.meta_file, "r") as f:

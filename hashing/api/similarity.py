@@ -3,15 +3,15 @@ import os
 import uuid
 from pathlib import Path
 from PIL import Image, UnidentifiedImageError
-from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Request, status
+from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Request, Response, status
 from fastapi.concurrency import run_in_threadpool
 from retriever.faiss_retriever import ImageRetriever
+from utils.hash_utils import compute_features, compute_similarities
 
 router = APIRouter()
 
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/jpg", "image/webp", "image/bmp"}
 MAX_UPLOAD_SIZE = int(os.getenv("MAX_UPLOAD_SIZE", 10 * 1024 * 1024))  # 10 MB
-
 
 def validate_image_bytes(image_bytes: bytes) -> str:
     try:
@@ -54,7 +54,21 @@ async def compute_similarity(
     # Offload the heavy synchronous FAISS task to a threadpool
     similar_images = await run_in_threadpool(retriever.get_similar_images_from_bytes, contents, k)
 
-    return {"status": "success", "data": {"similar_images": similar_images}}
+    results_with_scores = []
+
+    for image_name, score in similar_images:
+        target_image_bytes = retriever.get_image_by_name(image_name)
+
+        computed_features = await run_in_threadpool(compute_features, contents, target_image_bytes)
+        hash_similarities = await run_in_threadpool(compute_similarities, contents, target_image_bytes)
+        results_with_scores.append({
+            "image_name": image_name,
+            "similarityScore": score,
+            "computedFeatures": computed_features,
+            "hashSimilarities": hash_similarities
+        })
+
+    return {"status": "success", "data": {"similar_images": results_with_scores}}
 
 
 @router.post("/image")
@@ -112,7 +126,7 @@ async def upload_image(
     raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=result.get("error", "Unknown error"))
 
 
-@router.post("/delete")
+@router.delete("/image")
 async def delete_image(imageId: int, retriever: ImageRetriever = Depends(get_retriever)):
     """
     Endpoint to delete an image from the index
@@ -129,3 +143,16 @@ async def delete_image(imageId: int, retriever: ImageRetriever = Depends(get_ret
             "message": f"Image with ID {imageId} deleted successfully."
         }
     }
+
+
+@router.get("/image")
+async def get_image(imageId: int, retriever: ImageRetriever = Depends(get_retriever)):
+    """
+    Endpoint to retrieve an image by its ID
+    """
+    image_bytes = await run_in_threadpool(retriever.get_image_by_id, imageId)
+
+    if image_bytes is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f"Image with ID {imageId} not found.")
+
+    return Response(content=image_bytes, media_type="image/jpeg")
