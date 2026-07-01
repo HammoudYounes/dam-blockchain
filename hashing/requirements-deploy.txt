@@ -6,6 +6,8 @@ faiss-cpu
 numpy
 Pillow
 scipy
+joblib
+scikit-learn
 
 # Utilities
 tqdm

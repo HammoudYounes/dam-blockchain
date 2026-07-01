@@ -1,6 +1,7 @@
 import io
 import os
 import uuid
+import joblib
 from pathlib import Path
 from PIL import Image, UnidentifiedImageError
 from fastapi import APIRouter, Depends, File, UploadFile, HTTPException, Request, Response, status
@@ -9,6 +10,11 @@ from retriever.faiss_retriever import ImageRetriever
 from utils.hash_utils import compute_features, compute_similarities
 
 router = APIRouter()
+
+# Load model
+MODEL_PATH = Path(__file__).resolve().parents[1] / "data" / "model" / "copymint_logreg.joblib"
+MODEL = joblib.load(MODEL_PATH)
+FEATURES_ORDER = ["ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist", "rhash_dist", "chash_dist"]
 
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/jpg", "image/webp", "image/bmp"}
 MAX_UPLOAD_SIZE = int(os.getenv("MAX_UPLOAD_SIZE", 10 * 1024 * 1024))  # 10 MB
@@ -56,14 +62,20 @@ async def compute_similarity(
 
     results_with_scores = []
 
-    for image_name, score in similar_images:
+    for image_name, distance in similar_images:
         target_image_bytes = retriever.get_image_by_name(image_name)
 
         computed_features = await run_in_threadpool(compute_features, contents, target_image_bytes)
         hash_similarities = await run_in_threadpool(compute_similarities, contents, target_image_bytes)
+        
+        # Prepare for model
+        features_ordered = [computed_features[f] for f in FEATURES_ORDER]
+        prob = MODEL.predict_proba([features_ordered])[0, 1]
+
         results_with_scores.append({
             "image_name": image_name,
-            "similarityScore": score,
+            "distance": distance,
+            "duplicateProbability": float(prob),
             "computedFeatures": computed_features,
             "hashSimilarities": hash_similarities
         })

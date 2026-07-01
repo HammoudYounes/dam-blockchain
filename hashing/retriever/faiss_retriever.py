@@ -28,19 +28,26 @@ class ImageRetriever:
 
     def index_folder(self, input_folder: str, csv_name: str = "filtered_ground_truth.csv"):
         csv_path = os.path.join(input_folder, csv_name)
+        indexed_references = set()
         with open(csv_path, "r") as f:
             reader = csv.reader(f)
             next(reader)
             rows = list(reader)
             for row in tqdm(rows, desc="Indexing"):
                 reference, query, source = row
-                ref_path = os.path.join(input_folder, "references", reference)
-                try:
-                    embedding = self.embedder.get_embedding_from_path(ref_path)
-                    self.index.add(embedding, reference)
-                    self.index.query_references[query] = reference
-                except Exception as e:
-                    print(f"Error on {reference} / {query}: {e}")
+                
+                # Deduplicate based on reference image
+                if reference not in indexed_references:
+                    ref_path = os.path.join(input_folder, "references", reference)
+                    try:
+                        embedding = self.embedder.get_embedding_from_path(ref_path)
+                        self.index.add(embedding, reference)
+                        indexed_references.add(reference)
+                    except Exception as e:
+                        print(f"Error indexing reference {reference}: {e}")
+                
+                # Still record the query-reference relationship
+                self.index.query_references[query] = reference
 
     def index_image(self, image_path: str):
         try:
