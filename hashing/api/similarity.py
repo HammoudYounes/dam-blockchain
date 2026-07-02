@@ -74,6 +74,7 @@ async def compute_similarity(
 
         results_with_scores.append({
             "image_name": image_name,
+            "id": retriever.get_id_by_name(image_name),
             "distance": distance,
             "duplicateProbability": float(prob),
             "computedFeatures": computed_features,

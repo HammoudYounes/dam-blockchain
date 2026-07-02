@@ -64,3 +64,12 @@ class VectorIndex:
         self.index.remove_ids(ids)
         for id in ids:
             self.index_ids.pop(int(id), None)
+            
+    def get_id(self, name: str):
+        for id, metadata in self.index_ids.items():
+            if metadata == name:
+                return id
+        return None
+
+    def get_name(self, id: int):
+        return self.index_ids.get(id)

@@ -72,6 +72,18 @@ class ImageRetriever:
         self.index.remove_ids(np.array([image_id], dtype=np.int64))
         return True
 
+    def get_image_by_id(self, image_id: int):
+        image_name = self.index.get_name(image_id)
+        if image_name:
+            image_path = self.get_image_by_name(image_name)
+            if image_path:
+                with open(image_path, "rb") as f:
+                    return f.read()
+        return None
+    
+    def get_id_by_name(self, image_name: str):
+        return self.index.get_id(image_name)
+
     def get_image_by_name(self, image_name: str):
         POSSIBLE_PATHS = [
             os.path.join(self.dataset_dir, "references", image_name),
