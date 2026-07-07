@@ -1,0 +1,18 @@
+# Core ML
+torch
+torchvision
+transformers
+faiss-cpu
+numpy
+Pillow
+scipy
+joblib
+scikit-learn==1.6.1
+
+# Utilities
+tqdm
+
+# Api
+fastapi[standard]
+uvicorn
+python-multipart

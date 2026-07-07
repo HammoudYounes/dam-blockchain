@@ -14,7 +14,7 @@ from pathlib import Path
 import numpy as np
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
-from algorithms.Chash import CHash
+from algorithms.Chash import ColorHash
 
 
 HASH_BITS = 64
@@ -22,11 +22,12 @@ DATA_DIR = Path(__file__).resolve().parent.parent / "data" / "own"
 VARIANTS_CSV = DATA_DIR / "variants.csv"
 RESULTS_DIR = Path(__file__).resolve().parent.parent / "benchmark_results"
 
-_hash_cache: dict[str, CHash] = {}
+_hash_cache: dict[str, str] = {}
+hasher = ColorHash()
 
-def get_hash(relative_path: str) -> CHash:
+def get_hash(relative_path: str) -> str:
     if relative_path not in _hash_cache:
-        _hash_cache[relative_path] = CHash(str(DATA_DIR / relative_path))
+        _hash_cache[relative_path] = hasher.compute(str(DATA_DIR / relative_path))
     return _hash_cache[relative_path]
 
 def load_pairs():
@@ -122,7 +123,7 @@ def print_summary(title, result):
 def per_transform_report(positives, threshold):
     stats = {}
     for orig, variant, transform in positives:
-        d = CHash(str(DATA_DIR / orig)).hamming_distance(get_hash(variant))
+        d = ColorHash.hamming_distance(hasher.compute(str(DATA_DIR / orig)), get_hash(variant))
         if transform not in stats:
             stats[transform] = {"correct": 0, "total": 0, "distances": []}
         stats[transform]["correct"] += int(d <= threshold)
@@ -144,10 +145,10 @@ def main():
 
     print("\nComputing hashes and distances...")
     positive_distances = np.array(
-        [CHash(str(DATA_DIR / original)).hamming_distance(get_hash(variant)) for original, variant, _ in positives]
+        [ColorHash.hamming_distance(hasher.compute(str(DATA_DIR / original)), get_hash(variant)) for original, variant, _ in positives]
     )
     negative_distances = np.array(
-        [CHash(str(DATA_DIR / path_a)).hamming_distance(get_hash(path_b)) for path_a, path_b, _ in negatives]
+        [ColorHash.hamming_distance(hasher.compute(str(DATA_DIR / path_a)), get_hash(path_b)) for path_a, path_b, _ in negatives]
     )
 
     distances = np.concatenate([positive_distances, negative_distances])

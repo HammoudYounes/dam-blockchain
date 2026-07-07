@@ -1,0 +1,16 @@
+services:
+  hashing-service:
+    build:
+      context: ./hashing
+      dockerfile: Dockerfile
+    image: hashing-service:latest
+    ports:
+      - "8001:8001"
+    networks:
+      - app-network
+    volumes:
+      - ./hashing/data:/work/app/data
+    # user: "${UID}:${GID}"
+
+networks:
+  app-network:
