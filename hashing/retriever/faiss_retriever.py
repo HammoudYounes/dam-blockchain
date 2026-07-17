@@ -34,7 +34,14 @@ class ImageRetriever:
             next(reader)
             rows = list(reader)
             for row in tqdm(rows, desc="Indexing"):
-                reference, query, source = row
+                if len(row) == 3:
+                    reference, query, source = row
+                elif len(row) == 2:
+                    reference, query = row
+                    source = None
+                else:
+                    print(f"Skipping malformed row: {row}")
+                    continue
                 
                 # Deduplicate based on reference image
                 if reference not in indexed_references:

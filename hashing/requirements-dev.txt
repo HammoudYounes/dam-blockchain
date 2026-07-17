@@ -20,3 +20,4 @@ joblib
 fastapi[standard]
 uvicorn
 python-multipart # For handling file uploads in FastAPI
+requests
