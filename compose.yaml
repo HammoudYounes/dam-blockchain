@@ -12,5 +12,15 @@ services:
       - ./hashing/data:/work/app/data
     # user: "${UID}:${GID}"
 
+  frontend:
+    build:
+      context: ./frontend/dam-app
+      dockerfile: Dockerfile
+    image: dam-frontend:latest
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+
 networks:
   app-network:
