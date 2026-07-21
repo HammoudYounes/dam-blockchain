@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,100..900&display=swap');
+
 @import "tailwindcss";
 
 :root {
@@ -10,6 +13,8 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
+  --font-plex: "IBM Plex Mono", monospace;
+  --font-fraunces: "Fraunces", serif;
 }
 
 @media (prefers-color-scheme: dark) {

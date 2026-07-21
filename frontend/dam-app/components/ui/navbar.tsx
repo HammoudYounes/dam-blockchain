@@ -30,7 +30,7 @@ export default function Navbar() {
     }, [pathname]);
 
     return (
-        <header className="p-4">
+        <header className="p-4 sticky top-0 z-50">
             <nav className="mx-auto max-w-7xl flex items-center justify-between bg-white px-6 py-3 rounded-[10px] border border-gray-200 shadow-sm relative">
                 <div className="flex items-center gap-2">
                     <div className="w-6 h-6 bg-gray-200 rounded-sm"></div>
@@ -50,7 +50,7 @@ export default function Navbar() {
                         </Link>
                     ))}
                     <span
-                        className="absolute bottom-0 h-0.5 bg-black transition-all duration-300 ease-in-out"
+                        className="absolute top-9.5 h-1.5 bg-black transition-all duration-300 ease-in-out"
                         style={{
                             left: `${activeStyle.left}px`,
                             width: `${activeStyle.width}px`,
