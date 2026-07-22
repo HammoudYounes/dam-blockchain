@@ -1,6 +1,6 @@
 "use client";
 
-import FileUpload from "@/components/ui/upload-file";
+import FileUpload from "@/components/ui/upload/upload-file";
 
 const steps = [
     { number: 1, label: "Upload" },
