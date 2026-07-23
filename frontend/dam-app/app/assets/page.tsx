@@ -1,17 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { AssetCard } from "@/components/ui/assets/asset-card";
 import { MOCK_ASSETS } from "@/components/ui/assets/mock-assets";
 import { AssetFilters } from "@/components/ui/assets/asset-filters";
 import { AssetSearch } from "@/components/ui/assets/asset-search";
-
-const filters = [
-    { label: "All", count: "4,812" },
-    { label: "Verified", count: "4,761" },
-    { label: "Flagged", count: "39" },
-    { label: "Pending", count: "12" },
-];
 
 export default function AssetsPage() {
     const [activeFilter, setActiveFilter] = useState("All");
@@ -30,6 +23,13 @@ export default function AssetsPage() {
 
         return matchesStatus && matchesSearch;
     });
+
+    const filters = useMemo(() => [
+        { label: "All", count: filteredAssets.length.toLocaleString() },
+        { label: "Verified", count: filteredAssets.filter((asset) => asset.status === "minted").length.toLocaleString() },
+        { label: "Flagged", count: filteredAssets.filter((asset) => asset.status === "flagged").length.toLocaleString() },
+        { label: "Pending", count: filteredAssets.filter((asset) => asset.status === "pending").length.toLocaleString() },
+    ], []);
 
     return (<main className="p-10">
         <div className="text-7xl mt-2 font-fraunces font-medium">
