@@ -45,7 +45,6 @@ coverage.json
 .env.production
 
 # Docker
-.dockerignore
 docker-compose.override.yml
 
 # OS files
@@ -83,10 +82,7 @@ temp/
 .claude/
 
 # Dataset
-hashing/data/disc21/queries/*
-hashing/data/disc21/references/*
-hashing/data/own/images/*
-hashing/data/own/images_variants/*
+hashing/data/*
 *.7z
 *.zip
 *.tar.gz

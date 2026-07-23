@@ -1,0 +1,9 @@
+benchmark_results/
+data/*
+docs/
+tests/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+.git/
+.venv/

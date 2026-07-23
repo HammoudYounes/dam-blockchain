@@ -18,7 +18,10 @@ import sys
 from collections import defaultdict
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
-from algorithms.rhash import compute, hamming_distance
+from algorithms.rhash import RadialHash
+
+# Initialize RadialHash
+rhash = RadialHash()
 
 # ── Paths ──────────────────────────────────────────────────────────────────
 DATASET_DIR  = os.path.join(os.path.dirname(__file__), "..", "data", "own")
@@ -112,11 +115,11 @@ def compute_all_distances(pairs):
             continue
 
         if p["image_a"] not in hash_cache:
-            hash_cache[p["image_a"]] = compute(path_a)
+            hash_cache[p["image_a"]] = rhash.compute(path_a)
         if p["image_b"] not in hash_cache:
-            hash_cache[p["image_b"]] = compute(path_b)
+            hash_cache[p["image_b"]] = rhash.compute(path_b)
 
-        dist = hamming_distance(hash_cache[p["image_a"]], hash_cache[p["image_b"]])
+        dist = rhash.hamming_distance(hash_cache[p["image_a"]], hash_cache[p["image_b"]])
 
         results.append({
             "image_a":          p["image_a"],

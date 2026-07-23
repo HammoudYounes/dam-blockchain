@@ -34,6 +34,8 @@ from algorithms.ahash import AverageHash
 from algorithms.phash import PerceptualHash
 from algorithms.dhash import DifferenceHash
 from algorithms.HSVHash import HSVColorHash
+from algorithms.rhash import RadialHash
+from algorithms.Chash import ColorHash
 
 # ── Paths ─────────────────────────────────────────────────────────────────────
 REPO_ROOT      = SCRIPT_DIR.parent.parent          # dam-blockchain/
@@ -54,6 +56,8 @@ HASHERS = {
     "phash":   PerceptualHash(),
     "dhash":   DifferenceHash(),
     "hsvhash": HSVColorHash(),
+    "rhash":   RadialHash(),
+    "chash":   ColorHash(),
 }
 
 # How many negative pairs to generate per positive pair
@@ -143,6 +147,7 @@ def main():
     fieldnames = [
         "image_a", "image_b", "transformation", "label",
         "ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist",
+        "rhash_dist", "chash_dist",
     ]
 
     disc21_rows = []
@@ -198,7 +203,8 @@ def main():
     print("\nMean normalised distances by class (combined):")
     print(f"{'Algorithm':<14} {'Positive (dup)':>15} {'Negative (non-dup)':>19}")
     print("-" * 52)
-    for col in ("ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist"):
+    for col in ("ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist",
+                "rhash_dist", "chash_dist"):
         pos_mean = np.mean([float(r[col]) for r in pos])
         neg_mean = np.mean([float(r[col]) for r in neg])
         print(f"{col:<14} {pos_mean:>15.4f} {neg_mean:>19.4f}")
