@@ -73,10 +73,10 @@ export default function FileUpload({ onSubmit }: { onSubmit?: (files: File[]) =>
             <div className="grid grid-cols-2 gap-6">
 
                 {/* Left panel - queued files */}
-                <div className="border border-stone-300 rounded-2xl bg-white flex flex-col overflow-hidden">
-                    <div className="px-6 py-5 border-b border-stone-200">
+                <div className="border border-stone-300 dark:border-zinc-700 rounded-2xl bg-white dark:bg-zinc-950 flex flex-col overflow-hidden">
+                    <div className="px-6 py-5 border-b border-stone-200 dark:border-zinc-700">
                         <p className="text-2xl font-fraunces">Files ready to register</p>
-                        <p className="mt-1 text-sm font-mono text-stone-500">
+                        <p className="mt-1 text-sm font-mono text-stone-500 dark:text-stone-400">
                             {queue.length} file{queue.length === 1 ? "" : "s"} · {formatSize(totalSize)}
                         </p>
                     </div>
@@ -84,28 +84,28 @@ export default function FileUpload({ onSubmit }: { onSubmit?: (files: File[]) =>
                     <div className="flex-1 min-h-[380px] flex flex-col">
                         {queue.length === 0 ? (
                             <div className="flex-1 flex flex-col items-center justify-center gap-4 text-center px-10">
-                                <FileIcon className="w-8 h-8 text-stone-400" strokeWidth={1.5} />
-                                <p className="text-stone-500">
+                                <FileIcon className="w-8 h-8 text-stone-400 dark:text-stone-500" strokeWidth={1.5} />
+                                <p className="text-stone-500 dark:text-stone-400">
                                     Nothing queued yet - drop files on the right
                                 </p>
                             </div>
                         ) : (
-                            <ul className="divide-y divide-stone-100">
+                            <ul className="divide-y divide-stone-100 dark:divide-zinc-800">
                                 {queue.map((q) => (
                                     <li
                                         key={q.id}
                                         className="flex items-center justify-between px-6 py-3"
                                     >
                                         <div className="flex items-center gap-3 min-w-0">
-                                            <FileIcon className="w-4 h-4 text-stone-400 shrink-0" />
+                                            <FileIcon className="w-4 h-4 text-stone-400 dark:text-stone-500 shrink-0" />
                                             <span className="truncate">{q.file.name}</span>
-                                            <span className="text-sm font-mono text-stone-400 shrink-0">
+                                            <span className="text-sm font-mono text-stone-400 dark:text-stone-500 shrink-0">
                                                 {formatSize(q.file.size)}
                                             </span>
                                         </div>
                                         <button
                                             onClick={() => removeFile(q.id)}
-                                            className="text-stone-400 hover:text-stone-700 shrink-0"
+                                            className="text-stone-400 dark:text-stone-500 hover:text-stone-700 dark:hover:text-stone-300 shrink-0"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -124,8 +124,8 @@ export default function FileUpload({ onSubmit }: { onSubmit?: (files: File[]) =>
                     onDrop={handleDrop}
                     onClick={() => inputRef.current?.click()}
                     className={`cursor-pointer border rounded-2xl min-h-[380px] flex flex-col items-center justify-center gap-4 text-center transition-colors ${dragActive
-                        ? "border-teal-800 bg-teal-50"
-                        : "border-stone-300 bg-white"
+                        ? "border-teal-800 bg-teal-50 dark:bg-teal-950"
+                        : "border-stone-300 dark:border-zinc-700 bg-white dark:bg-zinc-950"
                         }`}
                 >
                     <input
@@ -140,8 +140,8 @@ export default function FileUpload({ onSubmit }: { onSubmit?: (files: File[]) =>
                         }}
                     />
 
-                    <div className="w-14 h-14 rounded-full border border-dashed border-stone-400 flex items-center justify-center">
-                        <Plus className="w-5 h-5 text-stone-500" />
+                    <div className="w-14 h-14 rounded-full border border-dashed border-stone-400 dark:border-zinc-500 flex items-center justify-center">
+                        <Plus className="w-5 h-5 text-stone-500 dark:text-stone-400" />
                     </div>
 
                     <p className="text-lg">
@@ -157,7 +157,7 @@ export default function FileUpload({ onSubmit }: { onSubmit?: (files: File[]) =>
                         </span>
                     </p>
 
-                    <p className="text-sm font-mono text-stone-500">
+                    <p className="text-sm font-mono text-stone-500 dark:text-stone-400">
                         PNG, JPG, GIF, WEBP · up to {MAX_SIZE_MB}MB each
                     </p>
                 </div>
@@ -170,7 +170,7 @@ export default function FileUpload({ onSubmit }: { onSubmit?: (files: File[]) =>
                     onClick={handleSubmit}
                     disabled={queue.length === 0 || submitting}
                     className={`px-8 py-3 rounded-full text-lg font-medium transition-colors ${queue.length === 0 || submitting
-                        ? "bg-stone-300 text-white cursor-not-allowed"
+                        ? "bg-stone-300 dark:bg-zinc-700 text-white dark:text-stone-400 cursor-not-allowed"
                         : "bg-teal-800 text-white hover:bg-teal-900"
                         }`}
                 >

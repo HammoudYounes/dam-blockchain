@@ -19,7 +19,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
+    --background: var(--color-zinc-800, #0a0a0a);
     --foreground: #ededed;
   }
 }

@@ -25,7 +25,7 @@ export default function ContractsPage() {
                 HOW THE THREE CONTRACTS CONNECT
             </h2>
 
-            <div className="w-full bg-white my-5 rounded-2xl border border-stone-300 p-8">
+            <div className="w-full bg-white dark:bg-zinc-950 my-5 rounded-2xl border border-stone-300 dark:border-zinc-700 p-8">
                 <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
                     {data.map((item, index) => (
                         <div
@@ -33,13 +33,13 @@ export default function ContractsPage() {
                             className="flex flex-col md:flex-row items-center gap-6"
                         >
                             <div className="flex flex-col items-center text-center gap-2 max-w-[220px]">
-                                <div className="w-12 h-12 bg-stone-100 rounded-sm flex items-center justify-center">
+                                <div className="w-12 h-12 bg-stone-100 dark:bg-zinc-800 rounded-sm flex items-center justify-center">
                                     <span className="font-plex">{item.number}</span>
                                 </div>
 
                                 <h3 className="text-sm font-mono">{item.title}</h3>
 
-                                <p className="text-sm text-gray-500">
+                                <p className="text-sm text-gray-500 dark:text-stone-400">
                                     {item.description}
                                 </p>
                             </div>
@@ -47,10 +47,10 @@ export default function ContractsPage() {
                             {index < data.length - 1 && (
                                 <>
                                     {/* Mobile */}
-                                    <ArrowDown className="w-5 h-5 text-stone-500 md:hidden" />
+                                    <ArrowDown className="w-5 h-5 text-stone-500 dark:text-stone-400 md:hidden" />
 
                                     {/* Desktop */}
-                                    <ArrowRight className="hidden md:block w-6 h-6 text-stone-500" />
+                                    <ArrowRight className="hidden md:block w-6 h-6 text-stone-500 dark:text-stone-400" />
                                 </>
                             )}
                         </div>

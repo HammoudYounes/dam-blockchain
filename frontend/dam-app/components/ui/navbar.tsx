@@ -31,26 +31,26 @@ export default function Navbar() {
 
     return (
         <header className="p-4 sticky top-0 z-50">
-            <nav className="mx-auto max-w-7xl flex items-center justify-between bg-white px-6 py-3 rounded-[10px] border border-gray-200 shadow-sm relative">
+            <nav className="mx-auto max-w-7xl flex items-center justify-between bg-white dark:bg-zinc-950 px-6 py-3 rounded-[10px] border border-gray-200 dark:border-zinc-800 shadow-sm relative">
                 <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 bg-gray-200 rounded-sm"></div>
+                    <div className="w-6 h-6 bg-gray-200 dark:bg-zinc-800 rounded-sm"></div>
                     <Link href="/" className="text-xl font-bold">
-                        <span className={`text-xl font-bold ${pathname === "/" ? "border-b-2 border-black" : ""}`}>DAM</span>
+                        <span className={`text-xl font-bold ${pathname === "/" ? "border-b-2 border-black dark:border-white" : ""}`}>DAM</span>
                     </Link>
                 </div>
-                <div className="flex items-center gap-8 text-sm font-medium text-gray-700 relative" ref={navRef}>
+                <div className="flex items-center gap-8 text-sm font-medium text-gray-700 dark:text-zinc-300 relative" ref={navRef}>
                     {links.map((link) => (
                         <Link
                             key={link.name}
                             href={link.href}
-                            className={`py-1 transition-colors duration-300 ${pathname === link.href ? "text-black" : "hover:text-black"
+                            className={`py-1 transition-colors duration-300 ${pathname === link.href ? "text-black dark:text-white" : "hover:text-black dark:hover:text-white"
                                 }`}
                         >
                             {link.name}
                         </Link>
                     ))}
                     <span
-                        className="absolute top-9.5 h-1.5 bg-black transition-all duration-300 ease-in-out"
+                        className="absolute top-9.5 h-1.5 bg-black dark:bg-white transition-all duration-300 ease-in-out"
                         style={{
                             left: `${activeStyle.left}px`,
                             width: `${activeStyle.width}px`,
@@ -58,7 +58,7 @@ export default function Navbar() {
                         }}
                     />
                 </div>
-                <button className="bg-gray-200 px-4 py-2 rounded-[10px] text-sm font-medium">
+                <button className="bg-gray-200 dark:bg-zinc-800 px-4 py-2 rounded-[10px] text-sm font-medium">
                     Connect Wallet
                 </button>
             </nav>
