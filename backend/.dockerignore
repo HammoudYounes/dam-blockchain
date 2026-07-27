@@ -1,0 +1,16 @@
+# Never bake these into the image — they are installed/built inside it.
+node_modules
+dist
+coverage
+
+# Secrets and local env — the container gets its env from compose/env_file.
+.env
+.env.*
+!.env.example
+
+# VCS and tooling noise.
+.git
+.gitignore
+Dockerfile
+.dockerignore
+*.log

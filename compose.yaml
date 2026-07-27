@@ -1,4 +1,33 @@
 services:
+  # T2 datastore — see backend/DESIGN.md §7. Postgres 17: the uuidv7() shim in
+  # backend/prisma/sql/init.sql installs the community implementation on 16/17
+  # (it is native only on 18+), and citext ships in the official contrib bundle.
+  #
+  # NOTE: the schema is NOT applied by this container. init.sql is woven into a
+  # Prisma migration, not run as an entrypoint script — its CHECK/index sections
+  # reference tables Prisma has not created yet. Bring this up, then run the
+  # migration from ./backend (see backend/README.md).
+  postgres:
+    image: postgres:17-alpine
+    container_name: dam-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-dam}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-dam_dev_password}
+      POSTGRES_DB: ${POSTGRES_DB:-dam}
+    ports:
+      - "${POSTGRES_PORT:-5432}:5432"
+    volumes:
+      - dam-pgdata:/var/lib/postgresql/data
+    networks:
+      - app-network
+    healthcheck:
+      # Wait for the DB to accept connections before dependents start.
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dam} -d ${POSTGRES_DB:-dam}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
   hashing-service:
     build:
       context: ./hashing
@@ -12,5 +41,34 @@ services:
       - ./hashing/data:/work/app/data
     # user: "${UID}:${GID}"
 
+  # T2 API — the DEPLOY/DEMO path, not the dev loop. While coding, run
+  # `npm run start:dev` on the host instead; only Postgres needs to be up.
+  # Requires backend/.env to exist (copy from backend/.env.example first).
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    image: dam-backend:latest
+    container_name: dam-backend
+    restart: unless-stopped
+    env_file:
+      - ./backend/.env
+    environment:
+      # Inside the compose network the DB host is `postgres`, not `localhost`,
+      # and the hashing host is the service name. These override backend/.env,
+      # whose localhost forms are for host-based dev.
+      DATABASE_URL: postgresql://${POSTGRES_USER:-dam}:${POSTGRES_PASSWORD:-dam_dev_password}@postgres:5432/${POSTGRES_DB:-dam}?schema=public
+      HASHING_SERVICE_URL: http://hashing-service:8001
+    ports:
+      - "${PORT:-3001}:3001"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - app-network
+
 networks:
   app-network:
+
+volumes:
+  dam-pgdata:
