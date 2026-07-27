@@ -1,0 +1,222 @@
+// DAM Backend — persistence layer (B8.1)
+// Generated from prisma/schema.prisma. Paste into https://dbdiagram.io
+//
+// Table and column names are the @map values (what actually exists in Postgres).
+// Partial indexes and CHECK constraints live in prisma/sql/init.sql — DBML cannot
+// express either, so they appear here as notes only.
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+Enum asset_status {
+  draft      [note: 'row exists, nothing on chain yet']
+  minting    [note: 'saga in flight']
+  registered [note: 'minted AND signature registered']
+  failed     [note: 'saga gave up; compensations applied']
+}
+
+Enum fingerprint_algorithm {
+  phash [note: 'canonical 64-bit — the only one anchored on chain']
+  ahash
+  dhash
+  hsv
+  rhash
+  chash
+}
+
+Enum mint_job_status {
+  running
+  stalled  [note: 'retryable failure, worker will pick it up']
+  orphaned [note: 'mintAsset mined, registerSignature did not — never roll back']
+  failed   [note: 'terminal; compensations applied']
+  done
+}
+
+Enum mint_step {
+  pinning_image
+  pinning_metadata
+  minting
+  registering
+  done
+}
+
+Enum verification_kind {
+  ownership
+  similarity
+}
+
+// ---------------------------------------------------------------------------
+// Tables
+// ---------------------------------------------------------------------------
+
+Table users {
+  id              uuid        [pk, default: `uuidv7()`]
+  wallet_address  citext      [not null, unique]
+  display_name    text
+  created_at      timestamptz [not null, default: `now()`]
+  last_login_at   timestamptz
+
+  Note: 'Created on first successful /auth/login (B4.2). A convenience join target — never a permission source. Authorisation is always: did this address sign?'
+}
+
+Table auth_nonces {
+  id          uuid        [pk, default: `uuidv7()`]
+  address     citext      [not null, note: 'keyed on address, not user_id — the first-ever login has no user row yet']
+  nonce       text        [not null, unique, note: 'the random challenge embedded in the SIWE message']
+  consumed_at timestamptz [note: 'single-use. Set on login; rejected even before TTL expires — this stops replay']
+  expires_at  timestamptz [not null]
+  created_at  timestamptz [not null, default: `now()`]
+
+  indexes {
+    (address, expires_at) [note: 'login lookup + expiry sweep']
+    (address, expires_at) [name: 'auth_nonces_live_idx', note: 'init.sql — PARTIAL: WHERE consumed_at IS NULL']
+  }
+
+  Note: 'Login challenges (B4.1). Redis with native EXPIRE is the better home once B10.2 lands a compose file.'
+}
+
+Table assets {
+  id                uuid        [pk, default: `uuidv7()`]
+  token_id          bigint      [unique, note: 'NULL while the mint is in flight; NULLs are distinct so plain UNIQUE gives partial-unique semantics']
+  creator_address   citext      [not null, note: 'mirrors creatorOf() — immutable once set']
+  owner_address     citext      [not null, note: 'mirrors ownerOf(). WRITTEN BY THE INDEXER ONLY (B8.4)']
+  image_cid         text
+  metadata_cid      text
+  token_uri         text        [unique]
+  title             text
+  description       text
+  mime_type         text
+  byte_size         integer
+  width             integer
+  height            integer
+  status            asset_status [not null, default: 'draft']
+  mint_tx_hash      char(66)
+  signature_tx_hash char(66)
+  minted_at_block   bigint
+  indexed_at_block  bigint      [note: 'staleness contract, returned on every /dashboard response. NULL until B8.4 ships']
+  created_at        timestamptz [not null, default: `now()`]
+  updated_at        timestamptz [not null]
+
+  indexes {
+    (creator_address, created_at) [note: 'created_at DESC — /dashboard by creator']
+    (owner_address, created_at)   [note: 'created_at DESC — /dashboard by owner']
+  }
+
+  Note: 'Projection of chain state + off-chain descriptive data. The row exists BEFORE the token does, so a crash mid-saga is always recoverable. Deliberately no user_id FK: the indexer writes rows for transfers made on Polygonscan by wallets that never logged in.'
+}
+
+Table asset_fingerprints {
+  asset_id     uuid                  [not null]
+  algorithm    fingerprint_algorithm [not null]
+  algo_version text                  [not null]
+  bits         bytea                 [not null, note: 'raw hash bits']
+  bit_length   smallint              [not null, note: 'REQUIRED, not padding. Differs per algorithm (dhash /72, hsv /42, phash /63)']
+  phash64      bigint                [note: 'phash only — popcount search column for B8.5. Signed int64: never ORDER BY directly']
+  created_at   timestamptz           [not null, default: `now()`]
+
+  indexes {
+    (asset_id, algorithm, algo_version) [pk]
+    phash64 [name: 'asset_fingerprints_phash64_idx', note: 'init.sql — PARTIAL: WHERE phash64 IS NOT NULL']
+  }
+
+  Note: 'Off-chain only. Many fingerprints per asset here; exactly one bytes32 on chain. The combiner scores on six distances, registerSignature accepts one — this table is the gap.'
+}
+
+Table asset_signatures {
+  asset_id            uuid        [pk]
+  perceptual_hash     bytea       [not null, unique, note: 'mirrors _registeredHashes. CHECK octet_length = 32']
+  sig_r               bytea       [not null, note: 'CHECK octet_length = 32']
+  sig_s               bytea       [not null, note: 'CHECK octet_length = 32']
+  sig_v               smallint    [not null, note: 'CHECK sig_v IN (27, 28)']
+  signer_address      citext      [not null, note: 'service key or creator, per DESIGN.md §10.1 — stored per-row so the answer survives a policy change']
+  registered_at_chain timestamptz [not null]
+  tx_hash             char(66)    [not null]
+  block_number        bigint      [not null]
+
+  Note: 'Read-through mirror of DAMSignature, so GET /signature/:tokenId and duplicate pre-checks skip an RPC round trip. VERIFICATION NEVER READS THIS TABLE — B7.1 always calls verifySignatureView().'
+}
+
+Table mint_jobs {
+  id                uuid            [pk, default: `uuidv7()`]
+  user_id           uuid            [not null]
+  asset_id          uuid            [not null, unique, note: 'one job produces at most one asset']
+  idempotency_key   text            [not null, unique, note: 'client-supplied. Two pins of identical bytes yield the same CID, so _registeredURIs alone will not stop a double submit']
+  status            mint_job_status [not null, default: 'running']
+  current_step      mint_step       [not null, default: 'pinning_image']
+  image_cid         text
+  metadata_cid      text
+  token_id          bigint
+  mint_tx_hash      char(66)
+  signature_tx_hash char(66)
+  attempt_count     integer         [not null, default: 0]
+  last_error        text
+  created_at        timestamptz     [not null, default: `now()`]
+  updated_at        timestamptz     [not null]
+
+  indexes {
+    (status, updated_at) [note: 'updated_at DESC — operator-facing show me failed jobs']
+    updated_at [name: 'mint_jobs_resumable_idx', note: 'init.sql — PARTIAL: WHERE status IN (running, stalled, orphaned). The resume worker query']
+  }
+
+  Note: 'The saga log. Once mintAsset is mined the NFT is permanent, so a failure in registerSignature can only be rolled FORWARD. Retries are safe by construction: registerSignature reverts on a duplicate tokenId/pHash, so re-running a completed step is a no-op.'
+}
+
+Table verifications {
+  id                uuid              [pk, default: `uuidv7()`]
+  kind              verification_kind [not null]
+  requester_address citext            [note: 'NULL for unauthenticated verification — /verify is public']
+  token_id          bigint            [note: 'NULL for similarity searches, which target no particular token']
+  submitted_hash    bytea             [not null]
+  result            boolean           [note: 'ownership verdict. NULL for similarity']
+  similarity_score  decimal(5,4)      [note: 'copy probability from the combiner. NULL for ownership']
+  model_version     text              [note: 'retraining the combiner changes past verdicts; a dispute needs to know which model answered']
+  onchain_tx_hash   char(66)          [note: 'NULL on the free verifySignatureView path']
+  created_at        timestamptz       [not null, default: `now()`]
+
+  indexes {
+    (requester_address, created_at) [note: 'created_at DESC']
+    (token_id, created_at)          [note: 'created_at DESC']
+  }
+
+  Note: 'Audit log. VerificationPerformed is emitted on chain but cannot be queried by requester or date. NO FK to assets: a verification may target a token we have not indexed yet, or one minted outside this app entirely — rejecting those would make the audit log lie.'
+}
+
+Table chain_sync_cursor {
+  contract_name        text        [pk]
+  contract_address     citext      [not null]
+  last_processed_block bigint      [not null]
+  updated_at           timestamptz [not null]
+
+  Note: 'Indexer bookmark, one row per contract. last_processed_block is advanced in the SAME transaction that applies the logs, and stays ~30 blocks behind head to absorb reorgs.'
+}
+
+// ---------------------------------------------------------------------------
+// Relations
+// ---------------------------------------------------------------------------
+
+Ref: mint_jobs.user_id > users.id                            // many-to-one
+Ref: asset_fingerprints.asset_id > assets.id [delete: cascade] // many-to-one
+Ref: asset_signatures.asset_id - assets.id   [delete: cascade] // one-to-one
+Ref: mint_jobs.asset_id - assets.id          [delete: cascade] // one-to-one
+
+// ---------------------------------------------------------------------------
+// Groups
+// ---------------------------------------------------------------------------
+
+TableGroup identity {
+  users
+  auth_nonces
+}
+
+TableGroup asset_domain {
+  assets
+  asset_fingerprints
+  asset_signatures
+}
+
+TableGroup operational {
+  mint_jobs
+  verifications
+  chain_sync_cursor
+}
