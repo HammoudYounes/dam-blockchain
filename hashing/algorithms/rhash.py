@@ -12,6 +12,9 @@ class RadialHash(ImageHasher):
     SECTORS = 8
     IMG_SIZE = 64
 
+    def __init__(self, multiplier: float = 1.79):
+        self.multiplier = multiplier
+
     def _compute_centroid(self, pixels: np.ndarray):
         rows, cols = np.indices(pixels.shape)
         total = pixels.sum()
@@ -22,7 +25,7 @@ class RadialHash(ImageHasher):
         return (cx + 0.5, cy + 0.5)
 
     def _get_inscribed_radius(self, cx: float, cy: float):
-        return min(cx, self.IMG_SIZE - cx, cy, self.IMG_SIZE - cy) * 0.92
+        return min(cx, self.IMG_SIZE - cx, cy, self.IMG_SIZE - cy) * self.multiplier
 
     def _compute_bin_means(self, pixels: np.ndarray, cx: float, cy: float, max_r: float):
         rows, cols = np.indices(pixels.shape)
