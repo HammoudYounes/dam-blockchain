@@ -1,0 +1,349 @@
+// DAM Backend — persistence layer (B8.1)
+//
+// The chain is authoritative for ownership and proof of authorship. Everything here is
+// either a labelled projection of chain state or operational state the chain cannot hold.
+// See DESIGN.md §3 for the decision record and §5 for the logical schema this implements.
+//
+// Conventions: snake_case tables/columns via @map, UUID v7 surrogate keys, citext for
+// addresses, timestamptz everywhere.
+
+generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["postgresqlExtensions"]
+}
+
+datasource db {
+  provider   = "postgresql"
+  url        = env("DATABASE_URL")
+  extensions = [citext]
+}
+
+// ---------------------------------------------------------------------------
+// Enums
+// ---------------------------------------------------------------------------
+
+enum AssetStatus {
+  draft // row exists, nothing on chain yet
+  minting // saga in flight
+  registered // minted AND signature registered
+  failed // saga gave up; compensations applied
+
+  @@map("asset_status")
+}
+
+enum FingerprintAlgorithm {
+  phash // canonical 64-bit — the only one anchored on chain
+  ahash
+  dhash
+  hsv
+  rhash
+  chash
+
+  @@map("fingerprint_algorithm")
+}
+
+/// Lifecycle of the saga. Distinct from MintStep, which says *where* it is.
+/// `orphaned` is the state that justifies this whole table: the NFT is minted but
+/// registerSignature() has not landed. It can only be rolled forward.
+enum MintJobStatus {
+  running
+  stalled // retryable failure, worker will pick it up
+  orphaned // mintAsset() mined, registerSignature() did not — never roll back
+  failed // terminal; compensations applied
+  done
+
+  @@map("mint_job_status")
+}
+
+enum MintStep {
+  pinning_image
+  pinning_metadata
+  minting
+  registering
+  done
+
+  @@map("mint_step")
+}
+
+enum VerificationKind {
+  ownership
+  similarity
+
+  @@map("verification_kind")
+}
+
+// ---------------------------------------------------------------------------
+// users
+// ---------------------------------------------------------------------------
+
+/// Created on first successful /auth/login (B4.2). A convenience join target —
+/// never a permission source. Authorisation is always "did this address sign?".
+model User {
+  id            String    @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  walletAddress String    @unique @map("wallet_address") @db.Citext
+  displayName   String?   @map("display_name")
+  createdAt     DateTime  @default(now()) @map("created_at") @db.Timestamptz(6)
+  lastLoginAt   DateTime? @map("last_login_at") @db.Timestamptz(6)
+
+  mintJobs MintJob[]
+
+  @@map("users")
+}
+
+// ---------------------------------------------------------------------------
+// auth_nonces
+// ---------------------------------------------------------------------------
+
+/// Login challenges (B4.1). DESIGN.md §9 flags Redis with native EXPIRE as the better
+/// home once B10.2 lands a compose file — until then a table with a sweep works.
+///
+/// Deliberately keyed on address, not userId: the first-ever login has no user row yet.
+model AuthNonce {
+  id      String @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  address String @map("address") @db.Citext
+
+  /// The random challenge embedded in the SIWE message.
+  nonce String @unique
+
+  /// Single-use. Set on successful /auth/login; a nonce with this set is rejected even
+  /// before the TTL expires, which is what stops replay.
+  consumedAt DateTime? @map("consumed_at") @db.Timestamptz(6)
+
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  // Lookup on login, plus the expiry sweep.
+  @@index([address, expiresAt])
+  @@map("auth_nonces")
+}
+
+// ---------------------------------------------------------------------------
+// assets
+// ---------------------------------------------------------------------------
+
+/// Projection of chain state + off-chain descriptive data. The row exists BEFORE the
+/// token does (DESIGN.md §6) so a crash mid-saga is always recoverable.
+///
+/// There is deliberately no `userId` FK. The indexer writes rows for transfers made
+/// directly on Polygonscan by wallets that never logged in — the address join is
+/// load-bearing, not laziness.
+model Asset {
+  id String @id @default(dbgenerated("uuidv7()")) @db.Uuid
+
+  /// NULL while the mint is in flight. Postgres treats NULLs as distinct, so a plain
+  /// UNIQUE gives the partial-unique semantics of DESIGN.md §5 with no extra DDL.
+  tokenId BigInt? @unique @map("token_id")
+
+  /// Mirrors creatorOf() — immutable once set.
+  creatorAddress String @map("creator_address") @db.Citext
+
+  /// Mirrors ownerOf(). WRITTEN BY THE INDEXER ONLY (B8.4). Never set from the
+  /// request path, or a transfer made outside the app silently desyncs.
+  ownerAddress String @map("owner_address") @db.Citext
+
+  imageCid    String? @map("image_cid")
+  metadataCid String? @map("metadata_cid")
+  tokenUri    String? @unique @map("token_uri")
+
+  title       String?
+  description String?
+
+  mimeType String? @map("mime_type")
+  byteSize Int?    @map("byte_size")
+  width    Int?
+  height   Int?
+
+  status AssetStatus @default(draft)
+
+  mintTxHash      String? @map("mint_tx_hash") @db.Char(66)
+  signatureTxHash String? @map("signature_tx_hash") @db.Char(66)
+
+  mintedAtBlock BigInt? @map("minted_at_block")
+
+  /// Block height this row was reconciled to. Returned on every /dashboard response —
+  /// this is the staleness contract (DESIGN.md §6). NULL until B8.4 ships.
+  indexedAtBlock BigInt? @map("indexed_at_block")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  fingerprints AssetFingerprint[]
+  signature    AssetSignature?
+  mintJob      MintJob?
+
+  // The two /dashboard queries, and nothing else.
+  @@index([creatorAddress, createdAt(sort: Desc)])
+  @@index([ownerAddress, createdAt(sort: Desc)])
+  @@map("assets")
+}
+
+// ---------------------------------------------------------------------------
+// asset_fingerprints
+// ---------------------------------------------------------------------------
+
+/// Off-chain only. Many fingerprints per asset here; exactly one bytes32 on chain.
+/// The combiner (hashing/combine/) scores on four distances, registerSignature()
+/// accepts one — this table is the gap.
+model AssetFingerprint {
+  assetId     String               @map("asset_id") @db.Uuid
+  algorithm   FingerprintAlgorithm
+  algoVersion String               @map("algo_version")
+
+  /// Raw hash bits.
+  bits Bytes
+
+  /// REQUIRED, not padding. The benchmark CSVs normalise over different denominators
+  /// per algorithm (dhash /72, hsv /42, phash /63). Assuming a uniform 64 silently
+  /// corrupts every distance calculation downstream.
+  bitLength Int @map("bit_length") @db.SmallInt
+
+  /// Populated for `phash` only — the popcount search column for B8.5.
+  /// Signed int64: a hash with the top bit set stores negative. XOR and bit_count are
+  /// unaffected; comparisons are not, so never ORDER BY this column directly.
+  phash64 BigInt?
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@id([assetId, algorithm, algoVersion])
+  @@map("asset_fingerprints")
+}
+
+// ---------------------------------------------------------------------------
+// asset_signatures
+// ---------------------------------------------------------------------------
+
+/// Read-through mirror of DAMSignature, so GET /signature/:tokenId and duplicate
+/// pre-checks skip an RPC round trip.
+///
+/// VERIFICATION NEVER READS THIS TABLE. B7.1 always calls verifySignatureView().
+model AssetSignature {
+  assetId String @id @map("asset_id") @db.Uuid
+
+  /// Mirrors _registeredHashes. 32 bytes.
+  perceptualHash Bytes @unique @map("perceptual_hash")
+
+  sigR Bytes @map("sig_r")
+  sigS Bytes @map("sig_s")
+  sigV Int   @map("sig_v") @db.SmallInt
+
+  /// Service key or creator, depending on DESIGN.md §10.1. Stored explicitly so the
+  /// answer is recoverable per-row if the policy changes mid-flight.
+  signerAddress String @map("signer_address") @db.Citext
+
+  registeredAtChain DateTime @map("registered_at_chain") @db.Timestamptz(6)
+  txHash            String   @map("tx_hash") @db.Char(66)
+  blockNumber       BigInt   @map("block_number")
+
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@map("asset_signatures")
+}
+
+// ---------------------------------------------------------------------------
+// mint_jobs
+// ---------------------------------------------------------------------------
+
+/// The saga log (DESIGN.md §7). Once mintAsset() is mined the NFT is permanent, so a
+/// failure in registerSignature() can only be rolled *forward*. This row is what makes
+/// that retry survive a process restart.
+///
+/// Retries are safe by construction: registerSignature reverts on a duplicate
+/// tokenId/pHash, so re-running a completed step is a no-op.
+model MintJob {
+  id     String @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+
+  /// One job produces at most one asset.
+  assetId String @unique @map("asset_id") @db.Uuid
+
+  /// Client-supplied. Stops a double-submitted upload from reverting at the contract
+  /// and burning gas on an opaque error. _registeredURIs alone will not prevent this —
+  /// two pins of identical bytes yield the same CID.
+  idempotencyKey String @unique @map("idempotency_key")
+
+  status      MintJobStatus @default(running)
+  currentStep MintStep      @default(pinning_image) @map("current_step")
+
+  imageCid    String? @map("image_cid")
+  metadataCid String? @map("metadata_cid")
+  tokenId     BigInt? @map("token_id")
+
+  mintTxHash      String? @map("mint_tx_hash") @db.Char(66)
+  signatureTxHash String? @map("signature_tx_hash") @db.Char(66)
+
+  attemptCount Int     @default(0) @map("attempt_count")
+  lastError    String? @map("last_error")
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  user  User  @relation(fields: [userId], references: [id])
+  asset Asset @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  // The resume worker's query is a partial index — see prisma/sql/init.sql.
+  // This plain index covers the operator-facing "show me failed jobs" case.
+  @@index([status, updatedAt(sort: Desc)])
+  @@map("mint_jobs")
+}
+
+// ---------------------------------------------------------------------------
+// verifications
+// ---------------------------------------------------------------------------
+
+/// Audit log (access pattern A9). VerificationPerformed is emitted on chain but cannot
+/// be queried by requester or date.
+///
+/// No FK to assets: a verification may target a token we have not indexed yet, or one
+/// minted outside this app entirely. Rejecting those would make the audit log lie.
+model Verification {
+  id   String           @id @default(dbgenerated("uuidv7()")) @db.Uuid
+  kind VerificationKind
+
+  /// NULL for unauthenticated verification — /verify is a public route.
+  requesterAddress String? @map("requester_address") @db.Citext
+
+  /// NULL for similarity searches, which target no particular token.
+  tokenId BigInt? @map("token_id")
+
+  submittedHash Bytes @map("submitted_hash")
+
+  /// Ownership verdict. NULL for similarity.
+  result Boolean?
+
+  /// Copy probability from the combiner. NULL for ownership.
+  similarityScore Decimal? @map("similarity_score") @db.Decimal(5, 4)
+
+  /// Retraining the combiner changes past verdicts. A dispute needs to know which
+  /// model produced which answer.
+  modelVersion String? @map("model_version")
+
+  /// NULL on the free verifySignatureView() path; set only when someone pays for the
+  /// on-chain audit trail.
+  onchainTxHash String? @map("onchain_tx_hash") @db.Char(66)
+
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  @@index([requesterAddress, createdAt(sort: Desc)])
+  @@index([tokenId, createdAt(sort: Desc)])
+  @@map("verifications")
+}
+
+// ---------------------------------------------------------------------------
+// chain_sync_cursor
+// ---------------------------------------------------------------------------
+
+/// Indexer bookmark, one row per contract. Without it, restarting the indexer means
+/// replaying from the deployment block.
+///
+/// last_processed_block is advanced in the SAME transaction that applies the logs,
+/// and stays ~30 blocks behind head to absorb reorgs (DESIGN.md §6).
+model ChainSyncCursor {
+  contractName       String   @id @map("contract_name")
+  contractAddress    String   @map("contract_address") @db.Citext
+  lastProcessedBlock BigInt   @map("last_processed_block")
+  updatedAt          DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+
+  @@map("chain_sync_cursor")
+}
