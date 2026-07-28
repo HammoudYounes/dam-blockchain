@@ -41,6 +41,14 @@ services:
       - ./hashing/data:/work/app/data
     # user: "${UID}:${GID}"
 
+  frontend:
+    build:
+      context: ./frontend/dam-app
+      dockerfile: Dockerfile
+    image: dam-frontend:latest
+    ports:
+      - "3000:3000"
+  
   # T2 API — the DEPLOY/DEMO path, not the dev loop. While coding, run
   # `npm run start:dev` on the host instead; only Postgres needs to be up.
   # Requires backend/.env to exist (copy from backend/.env.example first).
