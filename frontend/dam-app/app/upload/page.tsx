@@ -1,16 +1,49 @@
 "use client";
 
+import { useState } from "react";
 import FileUpload from "@/components/ui/upload/upload-file";
+import { signPHash } from "@/lib/signature";
+import { useWallet } from "@/hooks/useWallet";
 
 const steps = [
     { number: 1, label: "Upload" },
     { number: 2, label: "Hashing" },
-    { number: 3, label: "Blockchain registration" },
-    { number: 4, label: "Verification" },
+    { number: 3, label: "Sign" },
+    { number: 4, label: "Blockchain" },
 ];
 
 export default function UploadPage() {
-    const currentStep = 1;
+    const [currentStep, setCurrentStep] = useState(1);
+    const [hashingResult, setHashingResult] = useState<any>(null);
+    const { walletAddress } = useWallet();
+
+    const handleUploadSubmit = async (files: File[]) => {
+        setCurrentStep(2);
+        // Placeholder for step 1-2: Hashing
+        const formData = new FormData();
+        files.forEach((f) => formData.append("files", f));
+
+        const response = await fetch("http://localhost:8001/hash", {
+            method: "POST",
+            body: formData
+        });
+        const result = await response.json();
+        setHashingResult(result);
+
+        // Proceed to signing
+        setCurrentStep(3);
+
+        // Step 3: Sign (assuming result has the pHash)
+        // Note: In real flow, you'd iterate over files.
+        const pHash = result[0].hash;
+        const signature = await signPHash(pHash);
+
+        // Proceed to blockchain registration
+        setCurrentStep(4);
+
+        // Step 4: Register (Placeholder)
+        console.log("Registering:", { pHash, signature, creator: walletAddress });
+    };
 
     return (
         <main className="p-10 dark:text-white">
@@ -26,48 +59,31 @@ export default function UploadPage() {
                 then anchored on-chain.
             </div>
             <div className="w-full max-w-5xl mx-auto py-10">
-
-                {/* <!-- Line --> */}
                 <div className="relative flex justify-between">
-
                     <div className="absolute top-6 left-4 right-10 h-px bg-stone-300 dark:bg-stone-700"></div>
-
                     {steps.map((step) => {
                         const isActive = step.number <= currentStep;
-
                         return (
-                            <div
-                                key={step.number}
-                                className="relative z-10 flex flex-col items-center"
-                            >
-                                <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center text-lg ${isActive
-                                        ? "bg-teal-800 text-white"
-                                        : "bg-white dark:bg-zinc-950 border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-400"
-                                        }`}
-                                >
+                            <div key={step.number} className="relative z-10 flex flex-col items-center">
+                                <div className={`w-12 h-12 rounded-full flex items-center justify-center text-lg ${isActive ? "bg-teal-800 text-white" : "bg-white dark:bg-zinc-950 border border-stone-300 dark:border-stone-700 text-stone-600 dark:text-stone-400"}`}>
                                     {step.number}
                                 </div>
-                                <p
-                                    className={`mt-4 text-xl ${isActive ? "font-medium" : "text-stone-600 dark:text-stone-400"
-                                        }`}
-                                >
+                                <p className={`mt-4 text-xl ${isActive ? "font-medium" : "text-stone-600 dark:text-stone-400"}`}>
                                     {step.label}
                                 </p>
                             </div>
                         );
                     })}
-
                 </div>
-
             </div>
-            <FileUpload
-                onSubmit={async (files) => {
-                    const formData = new FormData();
-                    files.forEach((f) => formData.append("files", f));
-                    await fetch("http://localhost:8001/hash", { method: "POST", body: formData });
-                }}
-            />
+            {currentStep === 1 && (
+                <FileUpload onSubmit={handleUploadSubmit} />
+            )}
+            {currentStep > 1 && (
+                <div className="text-center p-10">
+                    <p className="text-2xl">Processing step {currentStep}...</p>
+                </div>
+            )}
         </main>
     );
 }
