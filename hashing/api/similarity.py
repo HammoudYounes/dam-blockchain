@@ -14,7 +14,7 @@ router = APIRouter()
 # Load model
 MODEL_PATH = Path(__file__).resolve().parents[1] / "data" / "model" / "copymint_logreg.joblib"
 MODEL = joblib.load(MODEL_PATH)
-FEATURES_ORDER = ["ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist", "rhash_dist", "chash_dist"]
+FEATURES_ORDER = ["ahash_dist", "phash_dist", "dhash_dist", "hsvhash_dist", "rhash_dist", "chash_dist", "cosine_similarity"]
 
 ALLOWED_TYPES = {"image/jpeg", "image/png", "image/jpg", "image/webp", "image/bmp"}
 MAX_UPLOAD_SIZE = int(os.getenv("MAX_UPLOAD_SIZE", 10 * 1024 * 1024))  # 10 MB
@@ -63,10 +63,13 @@ async def compute_similarity(
     results_with_scores = []
 
     for image_name, distance in similar_images:
-        target_image_bytes = retriever.get_image_by_name(image_name)
+        target_image_path = retriever.get_image_by_name(image_name)
+        with open(target_image_path, "rb") as f:
+            target_image_bytes = f.read()
 
         computed_features = await run_in_threadpool(compute_features, contents, target_image_bytes)
         hash_similarities = await run_in_threadpool(compute_similarities, contents, target_image_bytes)
+        computed_features["cosine_similarity"] = await run_in_threadpool(retriever.cosine_similarity, contents, target_image_bytes)
         
         # Prepare for model
         features_ordered = [computed_features[f] for f in FEATURES_ORDER]
