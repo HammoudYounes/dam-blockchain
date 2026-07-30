@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import axios from "axios";
 import FileUpload from "@/components/ui/upload/upload-file";
 import { signPHash } from "@/lib/signature";
 import { useWallet } from "@/hooks/useWallet";
@@ -29,27 +30,20 @@ export default function UploadPage() {
 
         let result;
         try {
-            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/upload`, {
-                method: "POST",
-                body: formData,
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/image/upload`, formData, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('jwt')}`
                 }
             });
 
-            if (response.status === 401) {
+            result = response.data;
+            setHashingResult(result);
+        } catch (error: any) {
+            if (error.response && error.response.status === 401) {
                 alert("Session expired. Please reconnect your wallet.");
                 setCurrentStep(1);
                 return;
             }
-
-            if (!response.ok) {
-                throw new Error('Upload failed');
-            }
-
-            result = await response.json();
-            setHashingResult(result);
-        } catch (error) {
             console.error(error);
             alert("An error occurred during upload. Please try again.");
             setCurrentStep(1);

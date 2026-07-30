@@ -1,12 +1,13 @@
 import { Controller, Post, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
+import { Multer } from 'multer';
 import { ImageService } from './image.service';
 
-@Controller('image/upload')
+@Controller('image')
 export class ImageController {
-  constructor(private readonly imageService: ImageService) {}
+  constructor(private readonly imageService: ImageService) { }
 
-  @Post()
+  @Post("/upload")
   @UseInterceptors(
     FilesInterceptor('files', 10, {
       limits: {
@@ -27,4 +28,3 @@ export class ImageController {
     return await this.imageService.processUploads(files);
   }
 }
-

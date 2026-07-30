@@ -1,7 +1,8 @@
 import { ethers } from "ethers";
+import axios from "axios";
 
 export async function connectWallet() {
-    if (!window.ethereum) {
+    if (typeof window === "undefined" || !window.ethereum) {
         alert("MetaMask not installed");
         return;
     }
@@ -19,9 +20,8 @@ export async function connectWallet() {
 }
 
 export async function getNonce(address: string) {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/nonce?address=${address}`);
-    const data = await response.json();
-    return data.nonce;
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/auth/nonce?address=${address}`);
+    return response.data.nonce;
 }
 
 export async function login(address: string, nonce: string) {
@@ -31,14 +31,12 @@ export async function login(address: string, nonce: string) {
     const message = `Sign this message to login: ${nonce}`;
     const signature = await signer.signMessage(message);
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, signature, nonce }),
+    const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        address, signature, nonce
     });
-    const data = await response.json();
-    return data.token;
+    return response.data.token;
 }
+
 
 export async function getConnectedWallet() {
     if (!window.ethereum) {

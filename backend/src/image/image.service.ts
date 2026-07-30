@@ -11,6 +11,7 @@ export class ImageService {
       originalname: file.originalname,
       size: file.size,
       mimetype: file.mimetype,
+      hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', // Dummy hash
     }));
   }
 }
