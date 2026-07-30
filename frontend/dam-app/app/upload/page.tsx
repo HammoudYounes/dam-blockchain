@@ -15,20 +15,47 @@ const steps = [
 export default function UploadPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [hashingResult, setHashingResult] = useState<any>(null);
-    const { walletAddress } = useWallet();
+    const { walletAddress, handleConnect } = useWallet();
 
     const handleUploadSubmit = async (files: File[]) => {
+        if (!walletAddress) {
+            alert("Please connect your wallet to upload.");
+            return;
+        }
         setCurrentStep(2);
-        // Placeholder for step 1-2: Hashing
+        // Step 1-2: Hashing
         const formData = new FormData();
         files.forEach((f) => formData.append("files", f));
 
-        const response = await fetch(`${process.env.NEXT_PUBLIC_HASHING_SERVICE_URL}/hash`, {
-            method: "POST",
-            body: formData
-        });
-        const result = await response.json();
-        setHashingResult(result);
+        let result;
+        try {
+            const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/image/upload`, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('jwt')}`
+                }
+            });
+
+            if (response.status === 401) {
+                alert("Session expired. Please reconnect your wallet.");
+                setCurrentStep(1);
+                return;
+            }
+
+            if (!response.ok) {
+                throw new Error('Upload failed');
+            }
+
+            result = await response.json();
+            setHashingResult(result);
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred during upload. Please try again.");
+            setCurrentStep(1);
+            return;
+        }
+
 
         // Proceed to signing
         setCurrentStep(3);
@@ -77,7 +104,19 @@ export default function UploadPage() {
                 </div>
             </div>
             {currentStep === 1 && (
-                <FileUpload onSubmit={handleUploadSubmit} />
+                walletAddress ? (
+                    <FileUpload onSubmit={handleUploadSubmit} />
+                ) : (
+                    <div className="text-center p-10 border border-dashed rounded-lg">
+                        <p className="text-xl mb-4">Please connect your wallet to start uploading.</p>
+                        <button
+                            className="bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700 px-6 py-3 rounded-[10px] text-sm font-medium transition-colors"
+                            onClick={handleConnect}
+                        >
+                            Connect Wallet
+                        </button>
+                    </div>
+                )
             )}
             {currentStep > 1 && (
                 <div className="text-center p-10">
