@@ -1,44 +1,337 @@
 algorithm,algo_key,best_threshold,case_type,image_a,image_b,transformation,hamming_distance,label
-aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/covered.png,covered_30%,16,1
-aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,16,1
-aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,28,1
-aHash (Average Hash),ahash,9,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,14,1
-aHash (Average Hash),ahash,9,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,30,1
-aHash (Average Hash),ahash,9,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
-aHash (Average Hash),ahash,9,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,16,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/brightened.png,brightened_1.5x,19,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,14,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,20,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,14,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/grayscale.png,grayscale,64,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/grayscale.png,grayscale,64,1
-CHash (Spatial Color Hash),chash,11,false_negative,images/beach.jpg,images_variants/beach/grayscale.png,grayscale,64,1
-CHash (Spatial Color Hash),chash,11,false_positive,images/beach.jpg,images_variants/golden_bridge/channel_shifted.png,cross_image,11,0
-dHash (Difference Hash),dhash,29,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,30,1
-dHash (Difference Hash),dhash,29,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,31,1
-dHash (Difference Hash),dhash,29,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,30,1
-dHash (Difference Hash),dhash,29,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,31,1
-dHash (Difference Hash),dhash,29,false_positive,images/beach.jpg,images_variants/golden_bridge/cropped20.png,cross_image,28,0
-HSV Hash,hsv,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/channel_shifted.png,channel_shift_1,6,1
-HSV Hash,hsv,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/channel_shifted.png,channel_shift_1,6,1
-HSV Hash,hsv,4,false_negative,images/beach.jpg,images_variants/beach/channel_shifted.png,channel_shift_1,6,1
-HSV Hash,hsv,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/contrasted.png,contrast_1.5x,8,1
-HSV Hash,hsv,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/contrasted.png,contrast_1.5x,5,1
-HSV Hash,hsv,4,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,6,1
-HSV Hash,hsv,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/grayscale.png,grayscale,5,1
-HSV Hash,hsv,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/grayscale.png,grayscale,5,1
-HSV Hash,hsv,4,false_positive,images/golden_bridge.webp,images_variants/dragon-bridge/channel_shifted.png,cross_image,4,0
-HSV Hash,hsv,4,false_positive,images/beach.jpg,images_variants/golden_bridge/grayscale.png,cross_image,4,0
-HSV Hash,hsv,4,false_positive,images/beach.jpg,images_variants/golden_bridge/brightened.png,cross_image,4,0
-pHash (Perceptual Hash),phash,22,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,29,1
-pHash (Perceptual Hash),phash,22,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,28,1
-pHash (Perceptual Hash),phash,22,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,38,1
-pHash (Perceptual Hash),phash,22,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,29,1
-pHash (Perceptual Hash),phash,22,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
-pHash (Perceptual Hash),phash,22,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,30,1
-rHash (Radial Hash),rhash,16,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,20,1
-rHash (Radial Hash),rhash,16,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,18,1
-rHash (Radial Hash),rhash,16,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,22,1
-rHash (Radial Hash),rhash,16,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,31,1
-rHash (Radial Hash),rhash,16,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,20,1
-rHash (Radial Hash),rhash,16,false_positive,images/golden_bridge.webp,images_variants/beach/cropped30.png,cross_image,9,0
+aHash (Average Hash),ahash,10,false_negative,images/corgi.jpg,images_variants/corgi/channel_shifted.png,channel_shift_1,17,1
+aHash (Average Hash),ahash,10,false_negative,images/corgi.jpg,images_variants/corgi/covered.png,covered_30%,16,1
+aHash (Average Hash),ahash,10,false_negative,images/images.jpg,images_variants/images/covered.png,covered_30%,13,1
+aHash (Average Hash),ahash,10,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/covered.png,covered_30%,17,1
+aHash (Average Hash),ahash,10,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped10.png,cropped_10%,13,1
+aHash (Average Hash),ahash,10,false_negative,images/corgi.jpg,images_variants/corgi/cropped10.png,cropped_10%,14,1
+aHash (Average Hash),ahash,10,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped10.png,cropped_10%,12,1
+aHash (Average Hash),ahash,10,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,16,1
+aHash (Average Hash),ahash,10,false_negative,images/images.jpg,images_variants/images/cropped10.png,cropped_10%,21,1
+aHash (Average Hash),ahash,10,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped10.png,cropped_10%,17,1
+aHash (Average Hash),ahash,10,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped10.png,cropped_10%,15,1
+aHash (Average Hash),ahash,10,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,14,1
+aHash (Average Hash),ahash,10,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped20.png,cropped_20%,26,1
+aHash (Average Hash),ahash,10,false_negative,images/corgi.jpg,images_variants/corgi/cropped20.png,cropped_20%,28,1
+aHash (Average Hash),ahash,10,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cropped_20%,24,1
+aHash (Average Hash),ahash,10,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,28,1
+aHash (Average Hash),ahash,10,false_negative,images/images.jpg,images_variants/images/cropped20.png,cropped_20%,35,1
+aHash (Average Hash),ahash,10,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped20.png,cropped_20%,31,1
+aHash (Average Hash),ahash,10,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped20.png,cropped_20%,17,1
+aHash (Average Hash),ahash,10,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped20.png,cropped_20%,22,1
+aHash (Average Hash),ahash,10,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,16,1
+aHash (Average Hash),ahash,10,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped30.png,cropped_30%,27,1
+aHash (Average Hash),ahash,10,false_negative,images/corgi.jpg,images_variants/corgi/cropped30.png,cropped_30%,31,1
+aHash (Average Hash),ahash,10,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cropped_30%,28,1
+aHash (Average Hash),ahash,10,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,30,1
+aHash (Average Hash),ahash,10,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
+aHash (Average Hash),ahash,10,false_negative,images/images.jpg,images_variants/images/cropped30.png,cropped_30%,30,1
+aHash (Average Hash),ahash,10,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped30.png,cropped_30%,14,1
+aHash (Average Hash),ahash,10,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped30.png,cropped_30%,48,1
+aHash (Average Hash),ahash,10,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped30.png,cropped_30%,24,1
+aHash (Average Hash),ahash,10,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped30.png,cropped_30%,28,1
+aHash (Average Hash),ahash,10,false_negative,images/corgi.jpg,images_variants/corgi/dropout.png,grid_dropout_20%,21,1
+aHash (Average Hash),ahash,10,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/dropout.png,grid_dropout_20%,14,1
+aHash (Average Hash),ahash,10,false_negative,images/images.jpg,images_variants/images/dropout.png,grid_dropout_20%,22,1
+aHash (Average Hash),ahash,10,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/dropout.png,grid_dropout_20%,16,1
+aHash (Average Hash),ahash,10,false_positive,images/golden_bridge.webp,images_variants/beach/covered.png,cross_image,10,0
+CHash (Spatial Color Hash),chash,4,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/altered.png,altered_20%,5,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/brightened.png,brightened_1.5x,19,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/brightened.png,brightened_1.5x,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/Shiba.jpg,images_variants/Shiba/brightened.png,brightened_1.5x,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/beach.jpg,images_variants/beach/channel_shifted.png,channel_shift_1,11,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/channel_shifted.png,channel_shift_1,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/channel_shifted.png,channel_shift_1,5,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/images.jpg,images_variants/images/channel_shifted.png,channel_shift_1,15,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/images.jpg,images_variants/images/contrasted.png,contrast_1.5x,8,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/contrasted.png,contrast_1.5x,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped10.png,cropped_10%,7,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/corgi.jpg,images_variants/corgi/cropped10.png,cropped_10%,5,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,14,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped10.png,cropped_10%,5,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/images.jpg,images_variants/images/cropped10.png,cropped_10%,16,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,5,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped20.png,cropped_20%,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/corgi.jpg,images_variants/corgi/cropped20.png,cropped_20%,25,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cropped_20%,8,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,20,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,9,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/images.jpg,images_variants/images/cropped20.png,cropped_20%,19,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped20.png,cropped_20%,6,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped20.png,cropped_20%,6,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped20.png,cropped_20%,8,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,8,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped30.png,cropped_30%,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/corgi.jpg,images_variants/corgi/cropped30.png,cropped_30%,24,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cropped_30%,12,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,14,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,10,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/images.jpg,images_variants/images/cropped30.png,cropped_30%,23,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped30.png,cropped_30%,7,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped30.png,cropped_30%,14,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped30.png,cropped_30%,7,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/beach.jpg,images_variants/beach/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/corgi.jpg,images_variants/corgi/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/images.jpg,images_variants/images/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/Shiba.jpg,images_variants/Shiba/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/grayscale.png,grayscale,64,1
+CHash (Spatial Color Hash),chash,4,false_positive,images/images.jpg,images_variants/corgi/altered.png,cross_image,4,0
+CHash (Spatial Color Hash),chash,4,false_positive,images/images.jpg,images_variants/corgi/filtered.png,cross_image,4,0
+CHash (Spatial Color Hash),chash,4,false_positive,images/images.jpg,images_variants/corgi/quality_adjusted_50.jpg,cross_image,4,0
+CHash (Spatial Color Hash),chash,4,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/cropped30.png,cross_image,4,0
+CHash (Spatial Color Hash),chash,4,false_positive,images/threecolorcorgi.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/channel_shifted.png,cross_image,4,0
+CHash (Spatial Color Hash),chash,4,false_positive,images/shiba-da-nang.png,images_variants/threecolorcorgi/contrasted.png,cross_image,4,0
+dHash (Difference Hash),dhash,18,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped10.png,cropped_10%,22,1
+dHash (Difference Hash),dhash,18,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped10.png,cropped_10%,20,1
+dHash (Difference Hash),dhash,18,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,30,1
+dHash (Difference Hash),dhash,18,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped10.png,cropped_10%,24,1
+dHash (Difference Hash),dhash,18,false_negative,images/images.jpg,images_variants/images/cropped10.png,cropped_10%,20,1
+dHash (Difference Hash),dhash,18,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,21,1
+dHash (Difference Hash),dhash,18,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped20.png,cropped_20%,28,1
+dHash (Difference Hash),dhash,18,false_negative,images/corgi.jpg,images_variants/corgi/cropped20.png,cropped_20%,36,1
+dHash (Difference Hash),dhash,18,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cropped_20%,31,1
+dHash (Difference Hash),dhash,18,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,31,1
+dHash (Difference Hash),dhash,18,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,29,1
+dHash (Difference Hash),dhash,18,false_negative,images/images.jpg,images_variants/images/cropped20.png,cropped_20%,35,1
+dHash (Difference Hash),dhash,18,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped20.png,cropped_20%,25,1
+dHash (Difference Hash),dhash,18,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped20.png,cropped_20%,33,1
+dHash (Difference Hash),dhash,18,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped20.png,cropped_20%,28,1
+dHash (Difference Hash),dhash,18,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped20.png,cropped_20%,23,1
+dHash (Difference Hash),dhash,18,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,27,1
+dHash (Difference Hash),dhash,18,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped30.png,cropped_30%,29,1
+dHash (Difference Hash),dhash,18,false_negative,images/corgi.jpg,images_variants/corgi/cropped30.png,cropped_30%,32,1
+dHash (Difference Hash),dhash,18,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cropped_30%,24,1
+dHash (Difference Hash),dhash,18,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,30,1
+dHash (Difference Hash),dhash,18,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,31,1
+dHash (Difference Hash),dhash,18,false_negative,images/images.jpg,images_variants/images/cropped30.png,cropped_30%,30,1
+dHash (Difference Hash),dhash,18,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped30.png,cropped_30%,32,1
+dHash (Difference Hash),dhash,18,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped30.png,cropped_30%,32,1
+dHash (Difference Hash),dhash,18,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped30.png,cropped_30%,43,1
+dHash (Difference Hash),dhash,18,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped30.png,cropped_30%,31,1
+dHash (Difference Hash),dhash,18,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/dropout.png,grid_dropout_20%,24,1
+dHash (Difference Hash),dhash,18,false_negative,images/Shiba.jpg,images_variants/Shiba/dropout.png,grid_dropout_20%,21,1
+dHash (Difference Hash),dhash,18,false_positive,images/shiba-da-nang.png,images_variants/cho-shiba-mau-nau/cropped20.png,cross_image,16,0
+dHash (Difference Hash),dhash,18,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/covered.png,cross_image,17,0
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/altered.png,altered_20%,6,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/altered.png,altered_20%,3,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/altered.png,altered_20%,7,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/altered.png,altered_20%,3,1
+HSV Hash,hsv,2,false_negative,images/Shiba.jpg,images_variants/Shiba/altered.png,altered_20%,3,1
+HSV Hash,hsv,2,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/altered.png,altered_20%,3,1
+HSV Hash,hsv,2,false_negative,images/beach.jpg,images_variants/beach/brightened.png,brightened_1.5x,3,1
+HSV Hash,hsv,2,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/brightened.png,brightened_1.5x,3,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/brightened.png,brightened_1.5x,5,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/brightened.png,brightened_1.5x,7,1
+HSV Hash,hsv,2,false_negative,images/beach.jpg,images_variants/beach/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/channel_shifted.png,channel_shift_1,8,1
+HSV Hash,hsv,2,false_negative,images/corgi.jpg,images_variants/corgi/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/channel_shifted.png,channel_shift_1,4,1
+HSV Hash,hsv,2,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/channel_shifted.png,channel_shift_1,4,1
+HSV Hash,hsv,2,false_negative,images/Shiba.jpg,images_variants/Shiba/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/channel_shifted.png,channel_shift_1,6,1
+HSV Hash,hsv,2,false_negative,images/beach.jpg,images_variants/beach/contrasted.png,contrast_1.5x,4,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/contrasted.png,contrast_1.5x,9,1
+HSV Hash,hsv,2,false_negative,images/corgi.jpg,images_variants/corgi/contrasted.png,contrast_1.5x,5,1
+HSV Hash,hsv,2,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/contrasted.png,contrast_1.5x,6,1
+HSV Hash,hsv,2,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/contrasted.png,contrast_1.5x,8,1
+HSV Hash,hsv,2,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/contrasted.png,contrast_1.5x,5,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/contrasted.png,contrast_1.5x,5,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/contrasted.png,contrast_1.5x,9,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/contrasted.png,contrast_1.5x,8,1
+HSV Hash,hsv,2,false_negative,images/Shiba.jpg,images_variants/Shiba/contrasted.png,contrast_1.5x,4,1
+HSV Hash,hsv,2,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/contrasted.png,contrast_1.5x,7,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/covered.png,covered_30%,5,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped10.png,cropped_10%,7,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/cropped10.png,cropped_10%,3,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped10.png,cropped_10%,4,1
+HSV Hash,hsv,2,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,3,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped20.png,cropped_20%,5,1
+HSV Hash,hsv,2,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cropped_20%,3,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/cropped20.png,cropped_20%,7,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped20.png,cropped_20%,8,1
+HSV Hash,hsv,2,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,6,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped30.png,cropped_30%,5,1
+HSV Hash,hsv,2,false_negative,images/corgi.jpg,images_variants/corgi/cropped30.png,cropped_30%,6,1
+HSV Hash,hsv,2,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cropped_30%,3,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/cropped30.png,cropped_30%,7,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped30.png,cropped_30%,6,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped30.png,cropped_30%,3,1
+HSV Hash,hsv,2,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped30.png,cropped_30%,3,1
+HSV Hash,hsv,2,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/darkened.png,darkened_0.5x,4,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/darkened.png,darkened_0.5x,6,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/darkened.png,darkened_0.5x,4,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/filtered.png,edge_filter,3,1
+HSV Hash,hsv,2,false_negative,images/beach.jpg,images_variants/beach/grayscale.png,grayscale,4,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/grayscale.png,grayscale,6,1
+HSV Hash,hsv,2,false_negative,images/corgi.jpg,images_variants/corgi/grayscale.png,grayscale,5,1
+HSV Hash,hsv,2,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/grayscale.png,grayscale,3,1
+HSV Hash,hsv,2,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/grayscale.png,grayscale,5,1
+HSV Hash,hsv,2,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/grayscale.png,grayscale,5,1
+HSV Hash,hsv,2,false_negative,images/images.jpg,images_variants/images/grayscale.png,grayscale,5,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/grayscale.png,grayscale,4,1
+HSV Hash,hsv,2,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/grayscale.png,grayscale,4,1
+HSV Hash,hsv,2,false_negative,images/Shiba.jpg,images_variants/Shiba/grayscale.png,grayscale,4,1
+HSV Hash,hsv,2,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/grayscale.png,grayscale,5,1
+HSV Hash,hsv,2,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/dropout.png,grid_dropout_20%,4,1
+HSV Hash,hsv,2,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/dropout.png,grid_dropout_20%,3,1
+HSV Hash,hsv,2,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/dropout.png,grid_dropout_20%,5,1
+HSV Hash,hsv,2,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/dropout.png,grid_dropout_20%,3,1
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/cho-shiba-mau-nau/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/cho-shiba-mau-nau/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/cho-shiba-mau-nau/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/cho-shiba-mau-nau/cropped20.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/cho-shiba-mau-nau.png,images_variants/images/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/cho-shiba-mau-nau/cropped30.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/cho-shiba-mau-nau/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/cho-shiba-mau-nau/cropped20.png,cross_image,0,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/cho-shiba-mau-nau/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/images.jpg,images_variants/corgi/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/blurred.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/cropped10.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/cropped20.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/quality_adjusted_20.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/quality_adjusted_50.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/shiba-da-nang/quality_adjusted_80.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/shiba-da-nang.png,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/altered.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images/Shiba.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/altered.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/covered.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/blurred.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/darkened.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/resized.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/resized_up.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/filtered.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/quality_adjusted_20.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/quality_adjusted_50.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/Shiba/quality_adjusted_80.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/blurred.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/brightened.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/resized.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/resized_up.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/filtered.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped10.png,cross_image,0,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/quality_adjusted_20.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/quality_adjusted_50.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/quality_adjusted_80.jpg,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/images.jpg,images_variants/dragon-bridge/channel_shifted.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/Shiba/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images/threecolorcorgi.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/blurred.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/brightened.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/resized.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/resized_up.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/quality_adjusted_20.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/quality_adjusted_50.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/golden_bridge.webp,images_variants/threecolorcorgi/quality_adjusted_80.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/covered.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/blurred.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/darkened.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/resized.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/resized_up.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/filtered.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/cropped20.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/quality_adjusted_20.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/quality_adjusted_50.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/golden_bridge/quality_adjusted_80.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/shiba-da-nang.png,images_variants/images/cropped20.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/images/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/IMG_5480-1-960x600.jpeg,images_variants/Shiba/dropout.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/IMG_5480-1-960x600/cropped30.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/IMG_5480-1-960x600/cropped30.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/shiba-da-nang.png,images_variants/Shiba/altered.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/shiba-da-nang/blurred.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/shiba-da-nang/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/shiba-da-nang/cropped20.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/shiba-da-nang/quality_adjusted_80.jpg,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/threecolorcorgi/altered.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/Shiba.jpg,images_variants/threecolorcorgi/dropout.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/Shiba/brightened.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/Shiba/cropped10.png,cross_image,2,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/Shiba/cropped20.png,cross_image,1,0
+HSV Hash,hsv,2,false_positive,images/threecolorcorgi.jpg,images_variants/Shiba/cropped30.png,cross_image,0,0
+pHash (Perceptual Hash),phash,19,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped10.png,cropped_10%,29,1
+pHash (Perceptual Hash),phash,19,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped10.png,cropped_10%,22,1
+pHash (Perceptual Hash),phash,19,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped10.png,cropped_10%,20,1
+pHash (Perceptual Hash),phash,19,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped10.png,cropped_10%,22,1
+pHash (Perceptual Hash),phash,19,false_negative,images/beach.jpg,images_variants/beach/cropped20.png,cropped_20%,38,1
+pHash (Perceptual Hash),phash,19,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped20.png,cropped_20%,33,1
+pHash (Perceptual Hash),phash,19,false_negative,images/corgi.jpg,images_variants/corgi/cropped20.png,cropped_20%,36,1
+pHash (Perceptual Hash),phash,19,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cropped_20%,24,1
+pHash (Perceptual Hash),phash,19,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,22,1
+pHash (Perceptual Hash),phash,19,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,28,1
+pHash (Perceptual Hash),phash,19,false_negative,images/images.jpg,images_variants/images/cropped20.png,cropped_20%,34,1
+pHash (Perceptual Hash),phash,19,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped20.png,cropped_20%,29,1
+pHash (Perceptual Hash),phash,19,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped20.png,cropped_20%,33,1
+pHash (Perceptual Hash),phash,19,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped20.png,cropped_20%,29,1
+pHash (Perceptual Hash),phash,19,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped20.png,cropped_20%,28,1
+pHash (Perceptual Hash),phash,19,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,30,1
+pHash (Perceptual Hash),phash,19,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped30.png,cropped_30%,35,1
+pHash (Perceptual Hash),phash,19,false_negative,images/corgi.jpg,images_variants/corgi/cropped30.png,cropped_30%,36,1
+pHash (Perceptual Hash),phash,19,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cropped_30%,28,1
+pHash (Perceptual Hash),phash,19,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,29,1
+pHash (Perceptual Hash),phash,19,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,26,1
+pHash (Perceptual Hash),phash,19,false_negative,images/images.jpg,images_variants/images/cropped30.png,cropped_30%,31,1
+pHash (Perceptual Hash),phash,19,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped30.png,cropped_30%,26,1
+pHash (Perceptual Hash),phash,19,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped30.png,cropped_30%,43,1
+pHash (Perceptual Hash),phash,19,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped30.png,cropped_30%,39,1
+pHash (Perceptual Hash),phash,19,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped30.png,cropped_30%,33,1
+pHash (Perceptual Hash),phash,19,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/dropout.png,grid_dropout_20%,20,1
+pHash (Perceptual Hash),phash,19,false_negative,images/images.jpg,images_variants/images/dropout.png,grid_dropout_20%,21,1
+pHash (Perceptual Hash),phash,19,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/dropout.png,grid_dropout_20%,24,1
+pHash (Perceptual Hash),phash,19,false_positive,images/beach.jpg,images_variants/cho-shiba-mau-nau/cropped30.png,cross_image,18,0
+pHash (Perceptual Hash),phash,19,false_positive,images/cho-shiba-mau-nau.png,images_variants/shiba-da-nang/dropout.png,cross_image,19,0
+pHash (Perceptual Hash),phash,19,false_positive,images/corgi.jpg,images_variants/threecolorcorgi/brightened.png,cross_image,17,0
+pHash (Perceptual Hash),phash,19,false_positive,images/corgi.jpg,images_variants/threecolorcorgi/channel_shifted.png,cross_image,19,0
+rHash (Radial Hash),rhash,14,false_negative,images/beach.jpg,images_variants/beach/covered.png,covered_30%,21,1
+rHash (Radial Hash),rhash,14,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/covered.png,covered_30%,18,1
+rHash (Radial Hash),rhash,14,false_negative,images/corgi.jpg,images_variants/corgi/covered.png,covered_30%,30,1
+rHash (Radial Hash),rhash,14,false_negative,images/images.jpg,images_variants/images/covered.png,covered_30%,18,1
+rHash (Radial Hash),rhash,14,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/covered.png,covered_30%,22,1
+rHash (Radial Hash),rhash,14,false_negative,images/Shiba.jpg,images_variants/Shiba/covered.png,covered_30%,16,1
+rHash (Radial Hash),rhash,14,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped10.png,cropped_10%,19,1
+rHash (Radial Hash),rhash,14,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped10.png,cropped_10%,18,1
+rHash (Radial Hash),rhash,14,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped20.png,cropped_20%,24,1
+rHash (Radial Hash),rhash,14,false_negative,images/corgi.jpg,images_variants/corgi/cropped20.png,cropped_20%,26,1
+rHash (Radial Hash),rhash,14,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped20.png,cropped_20%,16,1
+rHash (Radial Hash),rhash,14,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped20.png,cropped_20%,21,1
+rHash (Radial Hash),rhash,14,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped20.png,cropped_20%,16,1
+rHash (Radial Hash),rhash,14,false_negative,images/images.jpg,images_variants/images/cropped20.png,cropped_20%,26,1
+rHash (Radial Hash),rhash,14,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped20.png,cropped_20%,17,1
+rHash (Radial Hash),rhash,14,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped20.png,cropped_20%,32,1
+rHash (Radial Hash),rhash,14,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped20.png,cropped_20%,15,1
+rHash (Radial Hash),rhash,14,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped20.png,cropped_20%,23,1
+rHash (Radial Hash),rhash,14,false_negative,images/beach.jpg,images_variants/beach/cropped30.png,cropped_30%,19,1
+rHash (Radial Hash),rhash,14,false_negative,images/cho-shiba-mau-nau.png,images_variants/cho-shiba-mau-nau/cropped30.png,cropped_30%,29,1
+rHash (Radial Hash),rhash,14,false_negative,images/corgi.jpg,images_variants/corgi/cropped30.png,cropped_30%,31,1
+rHash (Radial Hash),rhash,14,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/cropped30.png,cropped_30%,24,1
+rHash (Radial Hash),rhash,14,false_negative,images/dragon-bridge.png,images_variants/dragon-bridge/cropped30.png,cropped_30%,23,1
+rHash (Radial Hash),rhash,14,false_negative,images/golden_bridge.webp,images_variants/golden_bridge/cropped30.png,cropped_30%,31,1
+rHash (Radial Hash),rhash,14,false_negative,images/images.jpg,images_variants/images/cropped30.png,cropped_30%,26,1
+rHash (Radial Hash),rhash,14,false_negative,images/IMG_5480-1-960x600.jpeg,images_variants/IMG_5480-1-960x600/cropped30.png,cropped_30%,22,1
+rHash (Radial Hash),rhash,14,false_negative,images/shiba-da-nang.png,images_variants/shiba-da-nang/cropped30.png,cropped_30%,39,1
+rHash (Radial Hash),rhash,14,false_negative,images/Shiba.jpg,images_variants/Shiba/cropped30.png,cropped_30%,25,1
+rHash (Radial Hash),rhash,14,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/cropped30.png,cropped_30%,25,1
+rHash (Radial Hash),rhash,14,false_negative,images/beach.jpg,images_variants/beach/dropout.png,grid_dropout_20%,17,1
+rHash (Radial Hash),rhash,14,false_negative,images/corgi.jpg,images_variants/corgi/dropout.png,grid_dropout_20%,21,1
+rHash (Radial Hash),rhash,14,false_negative,images/db10fa12e5d8164680ffd17b1b64fc1f.jpg,images_variants/db10fa12e5d8164680ffd17b1b64fc1f/dropout.png,grid_dropout_20%,15,1
+rHash (Radial Hash),rhash,14,false_negative,images/images.jpg,images_variants/images/dropout.png,grid_dropout_20%,23,1
+rHash (Radial Hash),rhash,14,false_negative,images/threecolorcorgi.jpg,images_variants/threecolorcorgi/dropout.png,grid_dropout_20%,15,1
+rHash (Radial Hash),rhash,14,false_positive,images/golden_bridge.webp,images_variants/beach/cropped30.png,cross_image,13,0
+rHash (Radial Hash),rhash,14,false_positive,images/Shiba.jpg,images_variants/shiba-da-nang/cropped30.png,cross_image,11,0

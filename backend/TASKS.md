@@ -93,10 +93,15 @@ Confirmed by executable proof-of-concept. Full write-up in [DESIGN.md §8](./DES
       - Also required: commit the logreg model + index files, or provide a build step
 - [ ] ✚ **BD.9** **Escalate the two HIGH contract findings** to the Epic 1 owner. Decide:
       redeploy with fixes in a later phase, or accept the risk for the demo. Record the answer.
-- [ ] **BD.6** Sequence diagrams for the five flows → largely covered by
-      [DESIGN.md §3–5](./DESIGN.md); extend to the frontend's own steps
-- [ ] **BD.7** Failure-mode design: what the user sees for `orphaned`, `unregisterable`,
-      T3 down, RPC timeout, insufficient gas
+- [x] ⟳ **BD.6** Sequence diagrams for **all eleven flows**, extended to the frontend's own
+      steps and annotated with per-step build state → [FLOWS.md](./FLOWS.md).
+      *(Was "the five flows" — the real count is eleven once the background workers, the
+      dashboard and the read paths are counted. Letter IDs there are now canonical; the
+      "Flow 1/2/4/5" labels used above map to them in FLOWS.md §0.1.)*
+- [ ] ⟳ **BD.7** Failure-mode design. **User-facing half done** in
+      [FLOWS.md](./FLOWS.md) — `orphaned`, `unregisterable`, T3 down, RPC timeout and revert
+      taxonomies each have a "what the user sees" table. Remaining: insufficient-gas policy on
+      the service wallet, and operator-facing alerting thresholds
 
 ## Epic 0 — Bootstrap
 

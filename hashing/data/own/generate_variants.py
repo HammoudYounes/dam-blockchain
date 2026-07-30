@@ -9,10 +9,27 @@ import shutil
 # Image Editor Module
 # =========================
 
-"""Load an image from a file path or URI."""
+"""Load an image from a file path or URI, normalised to RGB.
+
+P (palette) and RGBA sources break four of the transforms below: channel_shift rolls
+axis 2, which a 2-D palette array does not have; filter_kernel rejects mode P; and
+JPEG can encode neither, so encode_quality dies. Every hasher converts to L or RGB
+first anyway, so normalising here changes no benchmark result and keeps the variant
+set uniform across source formats.
+
+`filename` is restored after convert() — PIL drops it on the new object, and
+apply_and_save reads it for the CSV's original_image column. Stored as a POSIX path
+so the CSV is identical whichever platform generated it.
+"""
 def load(image_uri):
-    return Image.open(image_uri)
-    
+    image = Image.open(image_uri)
+    source = Path(getattr(image, "filename", None) or str(image_uri)).as_posix()
+    if image.mode != "RGB":
+        image = image.convert("RGB")
+    image.filename = source
+    return image
+
+
 """Save an image to a file path or URI."""
 def save(image, output_uri):
     image.save(output_uri)
@@ -93,7 +110,7 @@ def apply_and_save(image, output_uri, transformation, transformation_name, outpu
         save(transformed_image, output_uri)
         if output_csv_path is not None:
             with open(output_csv_path, "a") as f:
-                f.write(f"{getattr(image, 'filename', '')},{output_uri},{transformation_name}\n")
+                f.write(f"{getattr(image, 'filename', '')},{Path(output_uri).as_posix()},{transformation_name}\n")
 
 
 """Crop the image to a specified box (left, upper, right, lower)."""
@@ -106,7 +123,7 @@ def encode_quality(image, quality, output_uri, output_csv_path, quality_name=Non
     if output_csv_path is not None:
         name = quality_name or f"quality_{quality}"
         with open(output_csv_path, "a") as f:
-            f.write(f"{getattr(image, 'filename', '')},{output_uri},{name}\n")
+            f.write(f"{getattr(image, 'filename', '')},{Path(output_uri).as_posix()},{name}\n")
 """
 Main code
 """

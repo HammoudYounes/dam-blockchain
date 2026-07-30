@@ -12,7 +12,7 @@ class RadialHash(ImageHasher):
     SECTORS = 8
     IMG_SIZE = 64
 
-    def __init__(self, multiplier: float = 1.79):
+    def __init__(self, multiplier: float = 1.12):
         self.multiplier = multiplier
 
     def _compute_centroid(self, pixels: np.ndarray):
