@@ -23,7 +23,7 @@ export default function UploadPage() {
         const formData = new FormData();
         files.forEach((f) => formData.append("files", f));
 
-        const response = await fetch("http://localhost:8001/hash", {
+        const response = await fetch(`${process.env.NEXT_PUBLIC_HASHING_SERVICE_URL}/hash`, {
             method: "POST",
             body: formData
         });

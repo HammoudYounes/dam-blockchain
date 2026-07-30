@@ -1,8 +1,9 @@
 import { useState, useEffect } from "react";
-import { connectWallet, getConnectedWallet, disconnectWallet } from "@/lib/auth";
+import { connectWallet, getConnectedWallet, disconnectWallet, getNonce, login } from "@/lib/auth";
 
 export const useWallet = () => {
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
+    const [token, setToken] = useState<string | null>(null);
 
     useEffect(() => {
         const checkConnection = async () => {
@@ -12,6 +13,8 @@ export const useWallet = () => {
             }
         };
         checkConnection();
+        const savedToken = localStorage.getItem("jwt");
+        if (savedToken) setToken(savedToken);
     }, []);
 
     useEffect(() => {
@@ -24,6 +27,8 @@ export const useWallet = () => {
                 setWalletAddress(accounts[0]);
             } else {
                 setWalletAddress(null);
+                setToken(null);
+                localStorage.removeItem("jwt");
             }
         };
 
@@ -38,12 +43,23 @@ export const useWallet = () => {
         const address = await connectWallet();
         if (address) {
             setWalletAddress(address);
+            // Auto login after connecting
+            handleLogin(address);
         }
+    };
+
+    const handleLogin = async (address: string) => {
+        const nonce = await getNonce(address);
+        const token = await login(address, nonce);
+        setToken(token);
+        localStorage.setItem("jwt", token);
     };
 
     const handleDisconnect = async () => {
         await disconnectWallet();
         setWalletAddress(null);
+        setToken(null);
+        localStorage.removeItem("jwt");
     };
 
     const formatAddress = (address: string) => {
@@ -51,5 +67,5 @@ export const useWallet = () => {
         return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
     };
 
-    return { walletAddress, handleConnect, handleDisconnect, formatAddress };
+    return { walletAddress, token, handleConnect, handleDisconnect, formatAddress };
 };

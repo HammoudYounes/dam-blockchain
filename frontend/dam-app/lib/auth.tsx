@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 export async function connectWallet() {
     if (!window.ethereum) {
         alert("MetaMask not installed");
@@ -16,6 +18,27 @@ export async function connectWallet() {
     }
 }
 
+export async function getNonce(address: string) {
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/nonce?address=${address}`);
+    const data = await response.json();
+    return data.nonce;
+}
+
+export async function login(address: string, nonce: string) {
+    if (!window.ethereum) throw new Error("No ethereum provider");
+    const provider = new ethers.BrowserProvider(window.ethereum as any);
+    const signer = await provider.getSigner();
+    const message = `Sign this message to login: ${nonce}`;
+    const signature = await signer.signMessage(message);
+
+    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address, signature, nonce }),
+    });
+    const data = await response.json();
+    return data.token;
+}
 
 export async function getConnectedWallet() {
     if (!window.ethereum) {
@@ -26,10 +49,8 @@ export async function getConnectedWallet() {
             method: "eth_accounts",
         });
         if (accounts.length > 0) {
-            console.log("Connected address:", accounts[0]);
             return accounts[0];
         } else {
-            console.log("No connected wallet found");
             return null;
         }
     } catch (error) {
@@ -49,7 +70,6 @@ export async function disconnectWallet() {
             method: "eth_requestAccounts",
             params: [{ eth_accounts: [] }],
         });
-        console.log("Wallet disconnected");
     } catch (error) {
         console.error("Error disconnecting wallet:", error);
         alert("Error disconnecting wallet");
