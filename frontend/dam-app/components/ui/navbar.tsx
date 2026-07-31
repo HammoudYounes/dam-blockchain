@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
+import { useWallet } from "@/hooks/useWallet";
+import { useActiveLink } from "@/hooks/useActiveLink";
 
 export default function Navbar() {
     const pathname = usePathname();
@@ -13,21 +14,8 @@ export default function Navbar() {
         { name: "How it works", href: "/how-it-works" },
     ];
 
-    const [activeStyle, setActiveStyle] = useState<{
-        left: number;
-        width: number;
-        opacity: number;
-    }>({ left: 0, width: 0, opacity: 0 });
-    const navRef = useRef<HTMLDivElement>(null);
-
-    useEffect(() => {
-        const activeEl = navRef.current?.querySelector(`a[href="${pathname}"]`) as HTMLElement;
-        if (activeEl) {
-            setActiveStyle({ left: activeEl.offsetLeft, width: activeEl.offsetWidth, opacity: 1 });
-        } else {
-            setActiveStyle({ left: 0, width: 0, opacity: 0 });
-        }
-    }, [pathname]);
+    const { walletAddress, handleConnect, handleDisconnect, formatAddress } = useWallet();
+    const { navRef, activeStyle } = useActiveLink();
 
     return (
         <header className="p-4 sticky top-0 z-50">
@@ -58,9 +46,32 @@ export default function Navbar() {
                         }}
                     />
                 </div>
-                <button className="bg-gray-200 dark:bg-zinc-800 px-4 py-2 rounded-[10px] text-sm font-medium">
-                    Connect Wallet
-                </button>
+                {walletAddress ? (
+                    <div className="flex items-center gap-3">
+                        <span className="text-sm font-medium bg-gray-100 dark:bg-zinc-900 border border-gray-200 dark:border-zinc-800 px-3 py-1.5 rounded-[10px] font-mono">
+                            {formatAddress(walletAddress)}
+                        </span>
+                        <div className="flex flex-col items-end gap-1">
+                            <button
+                                className="bg-red-500 hover:bg-red-600 text-white dark:bg-red-600 dark:hover:bg-red-700 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors"
+                                onClick={() => {
+                                    if (confirm("Disconnect session? (Note: Wallet access remains authorized in your wallet until you manually disconnect it there.)")) {
+                                        handleDisconnect();
+                                    }
+                                }}
+                            >
+                                Disconnect
+                            </button>
+                        </div>
+                    </div>
+                ) : (
+                    <button
+                        className="bg-gray-200 dark:bg-zinc-800 hover:bg-gray-300 dark:hover:bg-zinc-700 px-4 py-2 rounded-[10px] text-sm font-medium transition-colors"
+                        onClick={handleConnect}
+                    >
+                        Connect Wallet
+                    </button>
+                )}
             </nav>
         </header>
     );
