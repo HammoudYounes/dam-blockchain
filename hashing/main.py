@@ -2,6 +2,7 @@ import os
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from api.similarity import router as similarity_router
+from api.hash import router as hash_router
 from retriever.faiss_retriever import ImageRetriever
 from retriever.embedder import ImageEmbedder
 from retriever.index import VectorIndex
@@ -36,6 +37,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(similarity_router)
+app.include_router(hash_router)
 
 @app.get("/")
 def read_root():

@@ -65,8 +65,8 @@ export async function disconnectWallet() {
     }
     try {
         await window.ethereum.request({
-            method: "eth_requestAccounts",
-            params: [{ eth_accounts: [] }],
+            method: "wallet_revokePermissions",
+            params: [{ eth_accounts: {} }],
         });
     } catch (error) {
         console.error("Error disconnecting wallet:", error);
