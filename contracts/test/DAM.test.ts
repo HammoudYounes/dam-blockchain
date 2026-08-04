@@ -10,6 +10,7 @@ describe("DAM System", function () {
   let owner: SignerWithAddress;
   let creator: SignerWithAddress;
   let attacker: SignerWithAddress;
+  let trustedSigner: SignerWithAddress; // stands in for the backend's PRIVATE_KEY wallet
 
   const SAMPLE_URI = "ipfs://QmSampleHash123";
   const SAMPLE_URI_2 = "ipfs://QmSampleHash456";
@@ -27,13 +28,16 @@ describe("DAM System", function () {
   }
 
   beforeEach(async function () {
-    [owner, creator, attacker] = await ethers.getSigners();
+    [owner, creator, attacker, trustedSigner] = await ethers.getSigners();
 
     const DAMAssetFactory = await ethers.getContractFactory("DAMAsset");
     damAsset = await DAMAssetFactory.deploy();
 
     const DAMSignatureFactory = await ethers.getContractFactory("DAMSignature");
-    damSignature = await DAMSignatureFactory.deploy();
+    damSignature = await DAMSignatureFactory.deploy(
+      await damAsset.getAddress(),
+      trustedSigner.address
+    );
 
     const DAMVerifierFactory = await ethers.getContractFactory("DAMVerifier");
     damVerifier = await DAMVerifierFactory.deploy(await damSignature.getAddress());
@@ -145,7 +149,14 @@ describe("DAM System", function () {
     let v: number;
 
     beforeEach(async function () {
-      ({ r, s, v } = await signAndSplit(creator, PERCEPTUAL_HASH));
+      // A token must actually exist and be owned by `creator` in DAMAsset —
+      // registerSignature() now cross-checks against assetContract.creatorOf(tokenId).
+      await damAsset.mintAsset(creator.address, SAMPLE_URI);
+
+      // The backend's trusted key signs the hash — NOT the creator's wallet.
+      // This is the service-key model (BD.5): the signature attests that the
+      // hashing pipeline produced this hash, not that the creator personally signed it.
+      ({ r, s, v } = await signAndSplit(trustedSigner, PERCEPTUAL_HASH));
     });
 
     describe("registerSignature", function () {
@@ -184,28 +195,46 @@ describe("DAM System", function () {
         await damSignature.registerSignature(1, PERCEPTUAL_HASH, r, s, v, creator.address);
         await expect(
           damSignature.registerSignature(1, PERCEPTUAL_HASH, r, s, v, creator.address)
-        ).to.be.revertedWith("DAMSignature: token already registered");
+        ).to.be.revertedWith("Token already registered");
       });
 
       it("should revert on duplicate perceptual hash", async function () {
         await damSignature.registerSignature(1, PERCEPTUAL_HASH, r, s, v, creator.address);
-        const hash2 = ethers.keccak256(ethers.toUtf8Bytes("other_image"));
-        const { r: r2, s: s2, v: v2 } = await signAndSplit(creator, hash2);
+        await damAsset.mintAsset(creator.address, SAMPLE_URI_2);
+        const { r: r2, s: s2, v: v2 } = await signAndSplit(trustedSigner, PERCEPTUAL_HASH);
         await expect(
           damSignature.registerSignature(2, PERCEPTUAL_HASH, r2, s2, v2, creator.address)
-        ).to.be.revertedWith("DAMSignature: hash already registered");
+        ).to.be.revertedWith("Hash already registered");
       });
 
       it("should revert on zero address creator", async function () {
         await expect(
           damSignature.registerSignature(1, PERCEPTUAL_HASH, r, s, v, ethers.ZeroAddress)
-        ).to.be.revertedWith("DAMSignature: creator is zero address");
+        ).to.be.revertedWith("Invalid creator");
       });
 
-      it("should revert on invalid token ID", async function () {
+      // NEW — regresses the original bug: this exact case (creator's own wallet
+      // signing) is what silently passed before the trustedSigner fix.
+      it("should revert if the hash was signed by the creator's own wallet instead of the trusted signer", async function () {
+        const { r: cr, s: cs, v: cv } = await signAndSplit(creator, PERCEPTUAL_HASH);
         await expect(
-          damSignature.registerSignature(0, PERCEPTUAL_HASH, r, s, v, creator.address)
-        ).to.be.revertedWith("DAMSignature: invalid token ID");
+          damSignature.registerSignature(1, PERCEPTUAL_HASH, cr, cs, cv, creator.address)
+        ).to.be.revertedWith("Signature not from trusted signer");
+      });
+
+      // NEW — an unrelated third party's signature must also be rejected
+      it("should revert if the hash was signed by an unrelated wallet", async function () {
+        const { r: ar, s: as_, v: av } = await signAndSplit(attacker, PERCEPTUAL_HASH);
+        await expect(
+          damSignature.registerSignature(1, PERCEPTUAL_HASH, ar, as_, av, creator.address)
+        ).to.be.revertedWith("Signature not from trusted signer");
+      });
+
+      // NEW — creator must match what DAMAsset actually recorded at mint time
+      it("should revert if the supplied creator does not match DAMAsset.creatorOf(tokenId)", async function () {
+        await expect(
+          damSignature.registerSignature(1, PERCEPTUAL_HASH, r, s, v, attacker.address)
+        ).to.be.revertedWith("Creator mismatch with DAMAsset");
       });
     });
 
@@ -213,7 +242,7 @@ describe("DAM System", function () {
       it("should revert for unregistered token", async function () {
         await expect(
           damSignature.getAssetSignature(99)
-        ).to.be.revertedWith("DAMSignature: token not registered");
+        ).to.be.revertedWith("Token not registered");
       });
 
       it("should return registeredAt timestamp", async function () {
@@ -244,7 +273,8 @@ describe("DAM System", function () {
     let v: number;
 
     beforeEach(async function () {
-      ({ r, s, v } = await signAndSplit(creator, PERCEPTUAL_HASH));
+      await damAsset.mintAsset(creator.address, SAMPLE_URI);
+      ({ r, s, v } = await signAndSplit(trustedSigner, PERCEPTUAL_HASH));
       await damSignature.registerSignature(1, PERCEPTUAL_HASH, r, s, v, creator.address);
     });
 
@@ -262,19 +292,10 @@ describe("DAM System", function () {
         ).to.equal(false);
       });
 
-      it("should return false for a hash signed by a different wallet", async function () {
-        const attackerHash = ethers.keccak256(ethers.toUtf8Bytes("attacker_image"));
-        const { r: ar, s: as_, v: av } = await signAndSplit(attacker, attackerHash);
-        await damSignature.registerSignature(2, attackerHash, ar, as_, av, creator.address);
-        expect(
-          await damVerifier.verifySignatureView(2, attackerHash)
-        ).to.equal(false);
-      });
-
       it("should revert for unregistered token", async function () {
         await expect(
           damVerifier.verifySignatureView(99, PERCEPTUAL_HASH)
-        ).to.be.revertedWith("DAMSignature: token not registered");
+        ).to.be.revertedWith("Token not registered");
       });
     });
 

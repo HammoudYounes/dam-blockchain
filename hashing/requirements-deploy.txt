@@ -9,6 +9,9 @@ scipy
 joblib
 scikit-learn==1.6.1
 
+# Signing
+eth-account
+
 # Utilities
 tqdm
 
