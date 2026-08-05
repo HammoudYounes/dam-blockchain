@@ -10,8 +10,8 @@ Three Solidity contracts deployed on **Polygon Amoy testnet** via Hardhat.
 | Contract | Address | Polygonscan |
 |---|---|---|
 | DAMAsset | `0xE7127207eB3E24B34021344aCB7D7Cff5D092A59` | [View](https://amoy.polygonscan.com/address/0xE7127207eB3E24B34021344aCB7D7Cff5D092A59#code) |
-| DAMSignature | `0xA55Ba1468967ad3a11adD593eA702673cc66d660` | [View](https://amoy.polygonscan.com/address/0xA55Ba1468967ad3a11adD593eA702673cc66d660#code) |
-| DAMVerifier | `0x1524c7e44fDad13f4288b36Fca468647002DbecF` | [View](https://amoy.polygonscan.com/address/0x1524c7e44fDad13f4288b36Fca468647002DbecF#code) |
+| DAMSignature | `0x1cF45EC178509B09EC060456D17eed03a197c569` | [View](https://amoy.polygonscan.com/address/0x1cF45EC178509B09EC060456D17eed03a197c569#code) |
+| DAMVerifier | `0xB9248CA44E5ebE6c900bFc85A3ad609b0382a7FB` | [View](https://amoy.polygonscan.com/address/0xB9248CA44E5ebE6c900bFc85A3ad609b0382a7FB#code) |
 
 All three contracts are verified — source code is publicly readable on Polygonscan.
 
@@ -57,8 +57,8 @@ POLYGONSCAN_API_KEY=YOUR_ETHERSCAN_API_KEY
 
 # Already deployed — do not change unless redeploying
 DAM_ASSET_ADDRESS=0xE7127207eB3E24B34021344aCB7D7Cff5D092A59
-DAM_SIGNATURE_ADDRESS=0xA55Ba1468967ad3a11adD593eA702673cc66d660
-DAM_VERIFIER_ADDRESS=0x1524c7e44fDad13f4288b36Fca468647002DbecF
+DAM_SIGNATURE_ADDRESS=0x1cF45EC178509B09EC060456D17eed03a197c569
+DAM_VERIFIER_ADDRESS=0xB9248CA44E5ebE6c900bFc85A3ad609b0382a7FB
 ```
 
 To get your keys:

@@ -1,5 +1,7 @@
 benchmark_results/
 data/*
+!data/model/
+!data/model/**
 docs/
 tests/
 **/__pycache__/
