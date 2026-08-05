@@ -38,6 +38,7 @@ export default function UploadPage() {
 
             result = response.data;
             console.log("Hashing result:", result);
+            setHashingResult(result);
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
                 alert("Session expired. Please reconnect your wallet.");
@@ -50,9 +51,22 @@ export default function UploadPage() {
             return;
         }
 
-
         // Proceed to signing
         setCurrentStep(3);
+
+        // Sign the phash
+        try {
+            const firstFileHash = result[0].phash;
+            const signature = await signPHash(firstFileHash);
+            console.log("Signature:", signature);
+            // Now you might want to send the signature to the backend or move to next step.
+            alert("PHash signed successfully!");
+            setCurrentStep(4);
+        } catch (error) {
+            console.error("Signing failed:", error);
+            alert("Signing failed.");
+            setCurrentStep(2);
+        }
     };
 
     return (

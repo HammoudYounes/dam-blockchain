@@ -13,13 +13,8 @@ export async function signPHash(pHash: string) {
     const provider = new ethers.BrowserProvider(window.ethereum);
     const signer = await provider.getSigner();
 
-    // Ensure pHash is treated as bytes
-    const pHashBytes = ethers.getBytes(pHash);
-
-    // Sign the hash
-    // Note: signMessage prepends the standard Ethereum message prefix.
-    // Ensure the smart contract verification (ECDSA.recover) handles this prefix.
-    const rawSignature = await signer.signMessage(pHashBytes);
+    // Sign the hash string directly so MetaMask displays the hex string
+    const rawSignature = await signer.signMessage(pHash);
 
     // Decompose into components
     const sig = ethers.Signature.from(rawSignature);
