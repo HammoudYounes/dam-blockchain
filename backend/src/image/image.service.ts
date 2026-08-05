@@ -6,12 +6,11 @@ export class ImageService {
     if (!files) {
       return [];
     }
-    // For now, just return file metadata as proof of receipt
     return files.map(file => ({
       originalname: file.originalname,
+      path: file.path,
       size: file.size,
       mimetype: file.mimetype,
-      hash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef', // Dummy hash
     }));
   }
 }

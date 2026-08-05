@@ -35,6 +35,8 @@ WORKDIR /app
 COPY --from=prod-deps --chown=node:node /app/node_modules ./node_modules
 COPY --from=build     --chown=node:node /app/dist         ./dist
 COPY --chown=node:node package.json ./
+# Create temp directory for file uploads
+RUN mkdir -p temp/uploads && chown -R node:node temp/uploads
 USER node
 EXPOSE 3001
 CMD ["node", "dist/main"]

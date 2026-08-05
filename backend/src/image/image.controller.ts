@@ -1,6 +1,7 @@
 import { Controller, Post, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Multer } from 'multer';
+import { diskStorage } from 'multer';
+import { extname, join } from 'path';
 import { ImageService } from './image.service';
 
 @Controller('image')
@@ -10,6 +11,13 @@ export class ImageController {
   @Post("/upload")
   @UseInterceptors(
     FilesInterceptor('files', 10, {
+      storage: diskStorage({
+        destination: '/app/temp/uploads',
+        filename: (req, file, callback) => {
+          const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+          callback(null, `${file.fieldname}-${uniqueSuffix}${extname(file.originalname)}`);
+        },
+      }),
       limits: {
         fileSize: 5 * 1024 * 1024, // 5MB
       },

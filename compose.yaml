@@ -74,9 +74,12 @@ services:
         condition: service_healthy
     networks:
       - app-network
+    volumes:
+      - ./dam-temp:/app/temp
 
 networks:
   app-network:
 
 volumes:
   dam-pgdata:
+  dam-temp:

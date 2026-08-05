@@ -24,7 +24,7 @@ export default function UploadPage() {
             return;
         }
         setCurrentStep(2);
-        // Step 1-2: Hashing
+        // Step 1: Upload files to the backend for hashing
         const formData = new FormData();
         files.forEach((f) => formData.append("files", f));
 
@@ -37,7 +37,7 @@ export default function UploadPage() {
             });
 
             result = response.data;
-            setHashingResult(result);
+            console.log("Hashing result:", result);
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
                 alert("Session expired. Please reconnect your wallet.");
@@ -53,17 +53,6 @@ export default function UploadPage() {
 
         // Proceed to signing
         setCurrentStep(3);
-
-        // Step 3: Sign (assuming result has the pHash)
-        // Note: In real flow, you'd iterate over files.
-        const pHash = result[0].hash;
-        const signature = await signPHash(pHash);
-
-        // Proceed to blockchain registration
-        setCurrentStep(4);
-
-        // Step 4: Register (Placeholder)
-        console.log("Registering:", { pHash, signature, creator: walletAddress });
     };
 
     return (
