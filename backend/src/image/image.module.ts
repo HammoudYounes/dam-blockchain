@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { HttpModule } from '@nestjs/axios';
 import { ImageController } from './image.controller';
 import { ImageService } from './image.service';
+import { IpfsModule } from '../ipfs/ipfs.module';
 
 @Module({
-  imports: [HttpModule],
+  imports: [IpfsModule],
   controllers: [ImageController],
-  providers: [ImageService]
+  providers: [ImageService],
 })
 export class ImageModule {}
