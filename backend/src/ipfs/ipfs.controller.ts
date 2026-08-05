@@ -29,6 +29,6 @@ export class IpfsController {
     const fileObj = new File([new Uint8Array(file.buffer)], file.originalname, { type: file.mimetype });
     
     const cid = await this.pinataService.pinFile(fileObj, file.originalname);
-    return { cid, ipfsUrl: `ipfs://${cid}` };
+    return { cid, ipfsUrl: this.pinataService.getGatewayUrl(cid) };
   }
 }

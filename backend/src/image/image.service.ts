@@ -3,7 +3,7 @@ import { PinataService } from '../ipfs/pinata.service';
 
 @Injectable()
 export class ImageService {
-  constructor(private readonly pinataService: PinataService) {}
+  constructor(private readonly pinataService: PinataService) { }
 
   async processUploads(files: Array<Express.Multer.File>) {
     if (!files || files.length === 0) {
@@ -24,7 +24,7 @@ export class ImageService {
           size: file.size,
           mimetype: file.mimetype,
           cid,
-          imageUri: `ipfs://${cid}`,
+          imageUri: this.pinataService.getGatewayUrl(cid),
         };
       }),
     );

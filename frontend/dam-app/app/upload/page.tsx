@@ -3,14 +3,13 @@
 import { useState } from "react";
 import axios from "axios";
 import FileUpload from "@/components/ui/upload/upload-file";
-import { signPHash } from "@/lib/signature";
 import { useWallet } from "@/hooks/useWallet";
+import { MintNftDto } from "@/types/MintNftDto";
 
 const steps = [
     { number: 1, label: "Upload" },
     { number: 2, label: "Hashing" },
-    { number: 3, label: "Sign" },
-    { number: 4, label: "Blockchain" },
+    { number: 3, label: "Blockchain" },
 ];
 
 export default function UploadPage() {
@@ -23,6 +22,7 @@ export default function UploadPage() {
             alert("Please connect your wallet to upload.");
             return;
         }
+
         setCurrentStep(2);
         // Step 1: Upload files to the backend for hashing
         const formData = new FormData();
@@ -51,20 +51,28 @@ export default function UploadPage() {
             return;
         }
 
-        // Proceed to signing
+        // Proceed to minting
         setCurrentStep(3);
 
-        // Sign the phash
+        // Mint
         try {
-            const firstFileHash = result[0].phash;
-            const signature = await signPHash(firstFileHash);
-            console.log("Signature:", signature);
-            // Now you might want to send the signature to the backend or move to next step.
-            alert("PHash signed successfully!");
-            setCurrentStep(4);
+
+            // Build MintNftDto
+            const mintDto: MintNftDto = {
+                imageUri: result[0].imageUri,
+                creator: walletAddress,
+            };
+
+            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/nft/mint`, mintDto, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('jwt')}`
+                }
+            });
+
+            alert("NFT minted successfully!");
         } catch (error) {
-            console.error("Signing failed:", error);
-            alert("Signing failed.");
+            console.error("Minting failed:", error);
+            alert("Minting failed.");
             setCurrentStep(2);
         }
     };
@@ -102,7 +110,9 @@ export default function UploadPage() {
             </div>
             {currentStep === 1 && (
                 walletAddress ? (
-                    <FileUpload onSubmit={handleUploadSubmit} />
+                    <div className="flex flex-col gap-4">
+                        <FileUpload onSubmit={handleUploadSubmit} />
+                    </div>
                 ) : (
                     <div className="text-center p-10 border border-dashed rounded-lg">
                         <p className="text-xl mb-4">Please connect your wallet to start uploading.</p>
@@ -123,3 +133,4 @@ export default function UploadPage() {
         </main>
     );
 }
+
