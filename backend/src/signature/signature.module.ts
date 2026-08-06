@@ -8,5 +8,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [HttpModule, ConfigModule],
   controllers: [SignatureController],
   providers: [SignatureService],
+  exports: [SignatureService],
+
 })
 export class SignatureModule {}

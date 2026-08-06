@@ -1,20 +1,19 @@
 import { ethers } from "ethers";
 import axios from "axios";
+import { EIP1193Provider } from "./eip6963";
 
-export async function connectWallet() {
-    if (typeof window === "undefined" || !window.ethereum) {
-        alert("MetaMask not installed");
+export async function connectWallet(provider: EIP1193Provider | null) {
+    if (!provider) {
+        alert("No wallet extension detected.");
         return;
     }
     try {
-        const [address] = await window.ethereum.request({
-            method: "eth_requestAccounts",
-        });
-        console.log("Connected address:", address);
-        return address;
+        const accounts: string[] = await provider.request({ method: "eth_requestAccounts" });
+        console.log("Connected address:", accounts[0]);
+        return accounts[0];
     } catch (error) {
-        console.error("Error connecting to MetaMask:", error);
-        alert("Error connecting to MetaMask");
+        console.error("Error connecting to wallet:", error);
+        alert("Error connecting to wallet");
         return;
     }
 }
@@ -24,47 +23,36 @@ export async function getNonce(address: string) {
     return response.data.nonce;
 }
 
-export async function login(address: string, nonce: string) {
-    if (!window.ethereum) throw new Error("No ethereum provider");
-    const provider = new ethers.BrowserProvider(window.ethereum as any);
-    const signer = await provider.getSigner();
+export async function login(provider: EIP1193Provider, address: string, nonce: string) {
+    const browserProvider = new ethers.BrowserProvider(provider as any);
+    const signer = await browserProvider.getSigner();
     const message = `Sign this message to login: ${nonce}`;
     const signature = await signer.signMessage(message);
 
     const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/auth/login`, {
-        address, signature, nonce
+        address, signature, nonce,
     });
     return response.data.token;
 }
 
-
-export async function getConnectedWallet() {
-    if (!window.ethereum) {
-        return null;
-    }
+export async function getConnectedWallet(provider: EIP1193Provider | null) {
+    if (!provider) return null;
     try {
-        const accounts = await window.ethereum.request({
-            method: "eth_accounts",
-        });
-        if (accounts.length > 0) {
-            return accounts[0];
-        } else {
-            return null;
-        }
+        const accounts: string[] = await provider.request({ method: "eth_accounts" });
+        return accounts.length > 0 ? accounts[0] : null;
     } catch (error) {
         console.error("Error getting connected wallet:", error);
-        alert("Error getting connected wallet");
         return null;
     }
 }
 
-export async function disconnectWallet() {
-    if (!window.ethereum) {
-        alert("MetaMask not installed");
+export async function disconnectWallet(provider: EIP1193Provider | null) {
+    if (!provider) {
+        alert("No wallet extension detected.");
         return;
     }
     try {
-        await window.ethereum.request({
+        await provider.request({
             method: "eth_requestAccounts",
             params: [{ eth_accounts: [] }],
         });
@@ -74,18 +62,13 @@ export async function disconnectWallet() {
     }
 }
 
-export async function isWalletConnected() {
-    if (!window.ethereum) {
-        return false;
-    }
+export async function isWalletConnected(provider: EIP1193Provider | null) {
+    if (!provider) return false;
     try {
-        const accounts = await window.ethereum.request({
-            method: "eth_accounts",
-        });
+        const accounts: string[] = await provider.request({ method: "eth_accounts" });
         return accounts.length > 0;
     } catch (error) {
         console.error("Error checking wallet connection:", error);
-        alert("Error checking wallet connection");
         return false;
     }
 }

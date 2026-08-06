@@ -34,13 +34,23 @@ class VectorIndex:
     def save(self):
         os.makedirs(os.path.dirname(self.index_file), exist_ok=True)
         os.makedirs(os.path.dirname(self.meta_file), exist_ok=True)
-        faiss.write_index(self.index, self.index_file)
-        with open(self.meta_file, "w") as f:
+
+        # Write to temp files first, then atomically replace -- a crash or
+        # interrupted write mid-save now leaves the previous good file intact
+        # instead of a truncated/corrupted one (see faiss_index_small.bin incident).
+        index_tmp = self.index_file + ".tmp"
+        meta_tmp = self.meta_file + ".tmp"
+
+        faiss.write_index(self.index, index_tmp)
+        with open(meta_tmp, "w") as f:
             json.dump({
                 "index_ids": self.index_ids,
                 "query_references": self.query_references,
                 "next_id": self.next_id,
             }, f)
+
+        os.replace(index_tmp, self.index_file)
+        os.replace(meta_tmp, self.meta_file)
 
     def load(self) -> bool:
         index_path = self.index_file
@@ -49,8 +59,15 @@ class VectorIndex:
 
         if not (os.path.exists(index_path) and os.path.exists(self.meta_file)):
             return False
-            
-        self.index = faiss.read_index(index_path)
+
+        try:
+            self.index = faiss.read_index(index_path)
+        except RuntimeError as e:
+            print(f"WARNING: failed to read FAISS index at {index_path} "
+                  f"(corrupted or truncated), starting fresh: {e}")
+            self._initialize_index()
+            return False
+
         if not isinstance(self.index, faiss.IndexIDMap):
             self.index = faiss.IndexIDMap(self.index)
         with open(self.meta_file, "r") as f:
@@ -64,7 +81,7 @@ class VectorIndex:
         self.index.remove_ids(ids)
         for id in ids:
             self.index_ids.pop(int(id), None)
-            
+
     def get_id(self, name: str):
         for id, metadata in self.index_ids.items():
             if metadata == name:

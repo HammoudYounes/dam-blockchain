@@ -11,9 +11,12 @@ export class SignatureService {
     private readonly configService: ConfigService,
   ) {}
 
-  async sign(fileBuffer: Buffer, filename: string) {
+  async sign(fileBuffer: Buffer, filename: string, contentType?: string) {
     const formData = new FormData();
-    formData.append('file', fileBuffer, filename);
+    formData.append('file', fileBuffer, {
+      filename,
+      contentType: contentType || 'application/octet-stream',
+    });
 
     const url = `${this.configService.get('HASHING_SERVICE_URL')}/sign`;
 
