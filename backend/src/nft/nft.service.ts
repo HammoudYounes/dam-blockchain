@@ -34,7 +34,7 @@ export class NftService {
     const event = receipt.logs.find(log => log.fragment?.name === 'AssetMinted');
     const tokenId = event?.args?.tokenId.toString();
 
-    return { status: 'minted', tokenId, uri };
+    return { status: 'minted', tokenId, uri, txHash: tx.hash };
   }
 
   async findOne(tokenId: string): Promise<any> {

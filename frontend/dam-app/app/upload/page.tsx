@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import FileUpload from "@/components/ui/upload/upload-file";
 import { useWallet } from "@/hooks/useWallet";
@@ -12,9 +12,23 @@ const steps = [
     { number: 3, label: "Blockchain" },
 ];
 
+function ProcessingIndicator({ step }: { step: number }) {
+    const [dots, setDots] = useState(".");
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setDots((prev) => (prev.length >= 3 ? "." : prev + "."));
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
+
+    return <p className="text-2xl">Processing step {step}{dots}</p>;
+}
+
 export default function UploadPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [hashingResult, setHashingResult] = useState<any>(null);
+    const [mintingResult, setMintingResult] = useState<any>(null);
     const { walletAddress, handleConnect } = useWallet();
 
     const handleUploadSubmit = async (files: File[]) => {
@@ -63,13 +77,13 @@ export default function UploadPage() {
                 creator: walletAddress,
             };
 
-            await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/nft/mint`, mintDto, {
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/nft/mint`, mintDto, {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('jwt')}`
                 }
             });
 
-            alert("NFT minted successfully!");
+            setMintingResult(response.data);
         } catch (error) {
             console.error("Minting failed:", error);
             alert("Minting failed.");
@@ -125,9 +139,38 @@ export default function UploadPage() {
                     </div>
                 )
             )}
-            {currentStep > 1 && (
+            {currentStep > 1 && !mintingResult && (
                 <div className="text-center p-10">
-                    <p className="text-2xl">Processing step {currentStep}...</p>
+                    <ProcessingIndicator step={currentStep} />
+                </div>
+            )}
+            {mintingResult && (
+                <div className="text-center p-10 border border-teal-800 dark:border-teal-500 rounded-lg bg-teal-50/50 dark:bg-teal-900/10">
+                    <p className="text-2xl text-teal-800 dark:text-teal-300 font-medium">NFT minted successfully!</p>
+                    <div className="mt-4 text-left font-mono text-stone-700 dark:text-stone-300">
+                        <p>
+                            <strong>Token URI:</strong>{" "}
+                            <a 
+                                href={mintingResult.uri} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-teal-800 dark:text-teal-400 hover:underline"
+                            >
+                                {mintingResult.uri}
+                            </a>
+                        </p>
+                        <p className="mt-2">
+                            <strong>Transaction Hash:</strong>{" "}
+                            <a 
+                                href={`https://amoy.polygonscan.com/tx/${mintingResult.txHash}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-teal-800 dark:text-teal-400 hover:underline"
+                            >
+                                {mintingResult.txHash}
+                            </a>
+                        </p>
+                    </div>
                 </div>
             )}
         </main>
