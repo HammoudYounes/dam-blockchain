@@ -4,7 +4,7 @@ import { PinataService } from '../ipfs/pinata.service';
 import { SignatureService } from '../signature/signature.service';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
-import { Contract } from 'ethers';
+import { Contract, ethers } from 'ethers';
 
 @Injectable()
 export class NftService {
@@ -40,21 +40,46 @@ export class NftService {
   async mint(dto: MintNftDto): Promise<any> {
     const metadata = this.buildMetadata(dto);
     console.log(`Minting NFT with metadata: ${JSON.stringify(metadata)}`);
-    const cid = await this.pinataService.pinJSON(metadata);
+    
+    let cid: string;
+    try {
+      cid = await this.pinataService.pinJSON(metadata);
+      console.log(`Metadata pinned with CID: ${cid}`);
+    } catch (e) {
+      this.logger.error(`pinJSON failed: ${e.message}`);
+      throw new InternalServerErrorException('Failed to pin metadata');
+    }
+
     const tokenUri = this.pinataService.getGatewayUrl(cid);
-    console.log(`Metadata pinned with CID: ${cid}, URI: ${tokenUri}`);
+    console.log(`URI: ${tokenUri}`);
 
     // Hash + sign the canonical pinned image with the service key
-    const { buffer, filename, contentType } = await this.fetchImageBytes(dto.imageUri);
-    const { hash, r, s, v } = await this.signatureService.sign(buffer, filename, contentType);
+    let sig: any;
+    try {
+      const { buffer, filename, contentType } = await this.fetchImageBytes(dto.imageUri);
+      sig = await this.signatureService.sign(buffer, filename, contentType);
+      console.log(`Signature obtained: ${JSON.stringify(sig)}`);
+    } catch (e) {
+      this.logger.error(`Signing failed: ${e.message}`);
+      throw new InternalServerErrorException('Failed to sign image');
+    }
+
+    const { hash, r, s, v } = sig;
+    
+    // Ensure r and s are bytes32 (padded to 32 bytes) for ethers v6
+    const rBytes32 = ethers.getBytes(r);
+    const sBytes32 = ethers.getBytes(s);
 
     // Mint asset
     let tokenId: string;
     let tx2: any;
     try {
+      console.log('Sending mintAsset transaction...');
       const tx = await this.assetContract.mintAsset(dto.creator, tokenUri);
+      console.log(`Transaction sent: ${tx.hash}`);
       tx2 = tx;
       const receipt = await tx.wait();
+      console.log('Transaction confirmed.');
 
       // Extract tokenId from AssetMinted event
       const event = receipt.logs.find(log => log.fragment?.name === 'AssetMinted');
@@ -69,10 +94,12 @@ export class NftService {
 
     // Register the hash + signature against the minted token
     try {
+      console.log(`Registering signature for tokenId=${tokenId}...`);
       const regTx = await this.signatureContract.registerSignature(
-        tokenId, hash, r, s, v, dto.creator,
+        tokenId, hash, rBytes32, sBytes32, v, dto.creator,
       );
       await regTx.wait();
+      console.log('Signature registered.');
     } catch (error) {
       this.logger.error(`registerSignature failed for tokenId=${tokenId}: ${error.message}`);
       throw new InternalServerErrorException(

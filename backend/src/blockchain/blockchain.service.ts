@@ -13,13 +13,22 @@ export class BlockchainService {
   constructor(private configService: ConfigService) {
     const rpcUrl = this.configService.get<string>('ALCHEMY_AMOY_URL');
     const privateKey = this.configService.get<string>('DEPLOYER_PRIVATE_KEY');
+    const chainId = this.configService.get<string>('CHAIN_ID');
 
-    if (!rpcUrl || !privateKey) {
+    console.log(`[BlockchainService] Initializing. RPC: ${rpcUrl}, ChainID: ${chainId}`);
+
+    if (!rpcUrl || !privateKey || !chainId) {
       throw new Error('Blockchain configuration missing');
     }
 
-    this.provider = new ethers.JsonRpcProvider(rpcUrl);
-    this.signer = new ethers.Wallet(privateKey, this.provider);
+    try {
+      this.provider = new ethers.JsonRpcProvider(rpcUrl, Number(chainId));
+      this.signer = new ethers.Wallet(privateKey, this.provider);
+      console.log('[BlockchainService] Initialized provider and signer.');
+    } catch (e) {
+      console.error('[BlockchainService] Failed to initialize:', e);
+      throw e;
+    }
   }
 
   getAssetContract() {
