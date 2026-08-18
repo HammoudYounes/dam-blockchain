@@ -1,5 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { SignatureController } from './signature.controller';
+import { SignatureService } from './signature.service';
 
 describe('SignatureController', () => {
   let controller: SignatureController;
@@ -7,6 +8,14 @@ describe('SignatureController', () => {
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       controllers: [SignatureController],
+      providers: [
+        {
+          provide: SignatureService,
+          useValue: {
+            sign: jest.fn(),
+          },
+        },
+      ],
     }).compile();
 
     controller = module.get<SignatureController>(SignatureController);

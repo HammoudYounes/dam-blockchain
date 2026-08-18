@@ -1,7 +1,7 @@
 import { Controller, Post, UseInterceptors, UploadedFiles, BadRequestException } from '@nestjs/common';
 import { FilesInterceptor } from '@nestjs/platform-express';
-import { Multer } from 'multer';
 import { ImageService } from './image.service';
+
 
 @Controller('image')
 export class ImageController {

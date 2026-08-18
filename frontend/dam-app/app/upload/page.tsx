@@ -1,21 +1,34 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
 import FileUpload from "@/components/ui/upload/upload-file";
-import { signPHash } from "@/lib/signature";
 import { useWallet } from "@/hooks/useWallet";
+import { MintNftDto } from "@/types/MintNftDto";
 
 const steps = [
     { number: 1, label: "Upload" },
     { number: 2, label: "Hashing" },
-    { number: 3, label: "Sign" },
-    { number: 4, label: "Blockchain" },
+    { number: 3, label: "Blockchain" },
 ];
+
+function ProcessingIndicator({ step }: { step: number }) {
+    const [dots, setDots] = useState(".");
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setDots((prev) => (prev.length >= 3 ? "." : prev + "."));
+        }, 500);
+        return () => clearInterval(interval);
+    }, []);
+
+    return <p className="text-2xl">Processing step {step}{dots}</p>;
+}
 
 export default function UploadPage() {
     const [currentStep, setCurrentStep] = useState(1);
     const [hashingResult, setHashingResult] = useState<any>(null);
+    const [mintingResult, setMintingResult] = useState<any>(null);
     const { walletAddress, handleConnect } = useWallet();
 
     const handleUploadSubmit = async (files: File[]) => {
@@ -23,8 +36,9 @@ export default function UploadPage() {
             alert("Please connect your wallet to upload.");
             return;
         }
+
         setCurrentStep(2);
-        // Step 1-2: Hashing
+        // Step 1: Upload files to the backend for hashing
         const formData = new FormData();
         files.forEach((f) => formData.append("files", f));
 
@@ -37,6 +51,7 @@ export default function UploadPage() {
             });
 
             result = response.data;
+            console.log("Hashing result:", result);
             setHashingResult(result);
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
@@ -50,20 +65,30 @@ export default function UploadPage() {
             return;
         }
 
-
-        // Proceed to signing
+        // Proceed to minting
         setCurrentStep(3);
 
-        // Step 3: Sign (assuming result has the pHash)
-        // Note: In real flow, you'd iterate over files.
-        const pHash = result[0].hash;
-        const signature = await signPHash(pHash);
+        // Mint
+        try {
 
-        // Proceed to blockchain registration
-        setCurrentStep(4);
+            // Build MintNftDto
+            const mintDto: MintNftDto = {
+                imageUri: result[0].imageUri,
+                creator: walletAddress,
+            };
 
-        // Step 4: Register (Placeholder)
-        console.log("Registering:", { pHash, signature, creator: walletAddress });
+            const response = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/nft/mint`, mintDto, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('jwt')}`
+                }
+            });
+
+            setMintingResult(response.data);
+        } catch (error) {
+            console.error("Minting failed:", error);
+            alert("Minting failed.");
+            setCurrentStep(2);
+        }
     };
 
     return (
@@ -99,7 +124,9 @@ export default function UploadPage() {
             </div>
             {currentStep === 1 && (
                 walletAddress ? (
-                    <FileUpload onSubmit={handleUploadSubmit} />
+                    <div className="flex flex-col gap-4">
+                        <FileUpload onSubmit={handleUploadSubmit} />
+                    </div>
                 ) : (
                     <div className="text-center p-10 border border-dashed rounded-lg">
                         <p className="text-xl mb-4">Please connect your wallet to start uploading.</p>
@@ -112,11 +139,41 @@ export default function UploadPage() {
                     </div>
                 )
             )}
-            {currentStep > 1 && (
+            {currentStep > 1 && !mintingResult && (
                 <div className="text-center p-10">
-                    <p className="text-2xl">Processing step {currentStep}...</p>
+                    <ProcessingIndicator step={currentStep} />
+                </div>
+            )}
+            {mintingResult && (
+                <div className="text-center p-10 border border-teal-800 dark:border-teal-500 rounded-lg bg-teal-50/50 dark:bg-teal-900/10">
+                    <p className="text-2xl text-teal-800 dark:text-teal-300 font-medium">NFT minted successfully!</p>
+                    <div className="mt-4 text-left font-mono text-stone-700 dark:text-stone-300">
+                        <p>
+                            <strong>Token URI:</strong>{" "}
+                            <a 
+                                href={mintingResult.uri} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-teal-800 dark:text-teal-400 hover:underline"
+                            >
+                                {mintingResult.uri}
+                            </a>
+                        </p>
+                        <p className="mt-2">
+                            <strong>Transaction Hash:</strong>{" "}
+                            <a 
+                                href={`https://amoy.polygonscan.com/tx/${mintingResult.txHash}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-teal-800 dark:text-teal-400 hover:underline"
+                            >
+                                {mintingResult.txHash}
+                            </a>
+                        </p>
+                    </div>
                 </div>
             )}
         </main>
     );
 }
+

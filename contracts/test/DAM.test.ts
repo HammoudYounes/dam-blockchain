@@ -12,8 +12,9 @@ describe("DAM System", function () {
   let attacker: SignerWithAddress;
   let trustedSigner: SignerWithAddress; // stands in for the backend's PRIVATE_KEY wallet
 
-  const SAMPLE_URI = "ipfs://QmSampleHash123";
-  const SAMPLE_URI_2 = "ipfs://QmSampleHash456";
+  const GATEWAY_BASE = "https://copper-keen-roadrunner-430.mypinata.cloud/ipfs/";
+  const SAMPLE_URI = `${GATEWAY_BASE}QmSampleHash123`;
+  const SAMPLE_URI_2 = `${GATEWAY_BASE}QmSampleHash456`;
   const PERCEPTUAL_HASH = ethers.keccak256(ethers.toUtf8Bytes("sample_image_hash"));
 
   // Split a signature into r, s, v components

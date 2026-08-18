@@ -29,10 +29,16 @@ export class PinataService {
   async pinJSON(metadata: any) {
     try {
       const upload = await this.pinata.upload.public.json(metadata);
+      this.logger.debug(`Upload result: ${JSON.stringify(upload)}`);
       return upload.cid;
     } catch (error) {
       this.logger.error(`Error pinning JSON: ${error.message}`);
       throw error;
     }
+  }
+
+  getGatewayUrl(cid: string): string {
+    const gateway = this.configService.get<string>('PINATA_GATEWAY');
+    return `https://${gateway}/ipfs/${cid}`;
   }
 }

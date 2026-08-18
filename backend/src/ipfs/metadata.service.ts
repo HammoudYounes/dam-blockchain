@@ -14,11 +14,11 @@ export class MetadataService {
     const metadata = {
       name,
       description,
-      image: `ipfs://${imageIpfsHash}`,
+      image: this.pinataService.getGatewayUrl(imageIpfsHash),
       attributes,
     };
 
     const ipfsHash = await this.pinataService.pinJSON(metadata);
-    return `ipfs://${ipfsHash}`;
+    return this.pinataService.getGatewayUrl(ipfsHash);
   }
 }

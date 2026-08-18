@@ -3,6 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from api.similarity import router as similarity_router
 from api.signing import router as signing_router
+from api.hash import router as hash_router
 from retriever.faiss_retriever import ImageRetriever
 from retriever.embedder import ImageEmbedder
 from retriever.index import VectorIndex
@@ -14,7 +15,6 @@ load_dotenv()
 async def lifespan(app: FastAPI):
     print("Starting up the application...")
     dataset_dir = os.getenv("DATASET_DIR", "data/merged")
-    # If not absolute, anchor to /work/app (standard app directory)
     if not os.path.isabs(dataset_dir):
         dataset_dir = os.path.join("/work/app", dataset_dir)
     model_size = os.getenv("MODEL_SIZE", "small")
@@ -27,17 +27,27 @@ async def lifespan(app: FastAPI):
         ),
         dataset_dir=dataset_dir
     )
-    app.state.retriever.initialize()
-    print("Application started successfully.")
+    try:
+        app.state.retriever.initialize()
+        app.state.retriever_ready = True
+        print("Application started successfully.")
+    except Exception as e:
+        # A broken similarity index shouldn't take down /hash, /sign,
+        # and /verify-ownership -- those don't touch this retriever at all.
+        print(f"WARNING: retriever failed to initialize, similarity search "
+              f"will be unavailable: {e}")
+        app.state.retriever_ready = False
     yield
-    print("Saving index...")
-    app.state.retriever.index.save()
-    print("Saved index successfully.")
+    if app.state.retriever_ready:
+        print("Saving index...")
+        app.state.retriever.index.save()
+        print("Saved index successfully.")
 
 app = FastAPI(lifespan=lifespan)
 
 app.include_router(similarity_router)
 app.include_router(signing_router)
+app.include_router(hash_router)
 
 @app.get("/")
 def read_root():

@@ -1,26 +1,40 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { connectWallet, getConnectedWallet, disconnectWallet, getNonce, login } from "@/lib/auth";
+import {
+    discoverProviders,
+    selectProvider,
+    rememberProviderChoice,
+    EIP1193Provider,
+    EIP6963ProviderDetail,
+} from "@/lib/eip6963";
 
 export const useWallet = () => {
     const [walletAddress, setWalletAddress] = useState<string | null>(null);
     const [token, setToken] = useState<string | null>(null);
+    const [availableProviders, setAvailableProviders] = useState<EIP6963ProviderDetail[]>([]);
+    const [activeProvider, setActiveProvider] = useState<EIP1193Provider | null>(null);
 
+    // Discover installed wallet extensions once, then resolve which one to use.
     useEffect(() => {
-        const checkConnection = async () => {
-            if (typeof window !== "undefined" && window.ethereum) {
-                const address = await getConnectedWallet();
-                setWalletAddress(address || null);
-            }
-        };
-        checkConnection();
-        const savedToken = localStorage.getItem("jwt");
-        if (savedToken) setToken(savedToken);
+        let cancelled = false;
+        discoverProviders().then((providers) => {
+            if (cancelled) return;
+            setAvailableProviders(providers);
+            setActiveProvider(selectProvider(providers));
+        });
+        return () => { cancelled = true; };
     }, []);
 
     useEffect(() => {
-        if (typeof window === "undefined" || !window.ethereum) return;
+        if (!activeProvider) return;
+        getConnectedWallet(activeProvider).then((address) => setWalletAddress(address || null));
 
-        const ethereum = window.ethereum;
+        const savedToken = localStorage.getItem("jwt");
+        if (savedToken) setToken(savedToken);
+    }, [activeProvider]);
+
+    useEffect(() => {
+        if (!activeProvider?.on) return;
 
         const handleAccountsChanged = (accounts: string[]) => {
             if (accounts && accounts.length > 0) {
@@ -32,31 +46,38 @@ export const useWallet = () => {
             }
         };
 
-        ethereum.on?.("accountsChanged", handleAccountsChanged);
+        activeProvider.on("accountsChanged", handleAccountsChanged);
+        return () => activeProvider.removeListener?.("accountsChanged", handleAccountsChanged);
+    }, [activeProvider]);
 
-        return () => {
-            ethereum.removeListener?.("accountsChanged", handleAccountsChanged);
-        };
-    }, []);
+    // Exposed for a future wallet-picker UI -- not built yet, but the
+    // plumbing to let a user explicitly choose among multiple wallets
+    // is here rather than always silently auto-selecting.
+    const selectWallet = useCallback((rdns: string) => {
+        const match = availableProviders.find((p) => p.info.rdns === rdns);
+        if (match) {
+            rememberProviderChoice(rdns);
+            setActiveProvider(match.provider);
+        }
+    }, [availableProviders]);
 
     const handleConnect = async () => {
-        const address = await connectWallet();
+        const address = await connectWallet(activeProvider);
         if (address) {
             setWalletAddress(address);
-            // Auto login after connecting
             handleLogin(address);
         }
     };
 
     const handleLogin = async (address: string) => {
-        const nonce = await getNonce(address);
-        const token = await login(address, nonce);
+        if (!activeProvider) return;
+        const token = await login(activeProvider, address, await getNonce(address));
         setToken(token);
         localStorage.setItem("jwt", token);
     };
 
     const handleDisconnect = async () => {
-        await disconnectWallet();
+        await disconnectWallet(activeProvider);
         setWalletAddress(null);
         setToken(null);
         localStorage.removeItem("jwt");
@@ -67,5 +88,8 @@ export const useWallet = () => {
         return `${address.substring(0, 6)}...${address.substring(address.length - 4)}`;
     };
 
-    return { walletAddress, token, handleConnect, handleDisconnect, formatAddress };
+    return {
+        walletAddress, token, handleConnect, handleDisconnect, formatAddress,
+        availableProviders, selectWallet,
+    };
 };

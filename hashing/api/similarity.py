@@ -29,7 +29,7 @@ def validate_image_bytes(image_bytes: bytes) -> str:
 
 def get_retriever(request: Request) -> ImageRetriever:
     retriever = getattr(request.app.state, "retriever", None)
-    if retriever is None:
+    if retriever is None or not getattr(request.app.state, "retriever_ready", False):
         raise HTTPException(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
             detail="Image retriever service is not ready.",

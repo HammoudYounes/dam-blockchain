@@ -23,7 +23,7 @@ services:
       - app-network
     healthcheck:
       # Wait for the DB to accept connections before dependents start.
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dam} -d ${POSTGRES_DB:-dam}"]
+      test: [ "CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-dam} -d ${POSTGRES_DB:-dam}" ]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -48,7 +48,7 @@ services:
     image: dam-frontend:latest
     ports:
       - "3000:3000"
-  
+
   # T2 API — the DEPLOY/DEMO path, not the dev loop. While coding, run
   # `npm run start:dev` on the host instead; only Postgres needs to be up.
   # Requires backend/.env to exist (copy from backend/.env.example first).
@@ -80,3 +80,4 @@ networks:
 
 volumes:
   dam-pgdata:
+  dam-temp:
