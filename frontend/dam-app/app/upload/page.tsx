@@ -53,6 +53,12 @@ export default function UploadPage() {
             result = response.data;
             console.log("Hashing result:", result);
             setHashingResult(result);
+
+            if (result[0]?.isDuplicate) {
+                alert("This image is a duplicate of an existing asset and cannot be minted.");
+                setCurrentStep(1);
+                return;
+            }
         } catch (error: any) {
             if (error.response && error.response.status === 401) {
                 alert("Session expired. Please reconnect your wallet.");
