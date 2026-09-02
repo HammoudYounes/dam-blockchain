@@ -2,6 +2,7 @@ import { Inject, Injectable, Logger, InternalServerErrorException } from '@nestj
 import { MintNftDto } from './dto/mint-nft.dto';
 import { PinataService } from '../ipfs/pinata.service';
 import { SignatureService } from '../signature/signature.service';
+import { HashingService } from '../hashing/hashing.service';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Contract, ethers } from 'ethers';
@@ -13,6 +14,7 @@ export class NftService {
   constructor(
     private readonly pinataService: PinataService,
     private readonly signatureService: SignatureService,
+    private readonly hashingService: HashingService,
     private readonly httpService: HttpService,
     @Inject('DAM_ASSET_CONTRACT') private readonly assetContract: Contract,
     @Inject('DAM_SIGNATURE_CONTRACT') private readonly signatureContract: Contract,
@@ -55,9 +57,10 @@ export class NftService {
 
     // Hash + sign the canonical pinned image with the service key
     let sig: any;
+    let imageDetails: any;
     try {
-      const { buffer, filename, contentType } = await this.fetchImageBytes(dto.imageUri);
-      sig = await this.signatureService.sign(buffer, filename, contentType);
+      imageDetails = await this.fetchImageBytes(dto.imageUri);
+      sig = await this.signatureService.sign(imageDetails.buffer, imageDetails.filename, imageDetails.contentType);
       console.log(`Signature obtained: ${JSON.stringify(sig)}`);
     } catch (e) {
       this.logger.error(`Signing failed: ${e.message}`);
@@ -113,6 +116,20 @@ export class NftService {
       throw new InternalServerErrorException(
         `NFT minted (tokenId=${tokenId}) but signature registration failed: ${error.message}`,
       );
+    }
+
+    // Index the image for similarity search
+    try {
+      console.log(`Indexing image for tokenId=${tokenId}...`);
+      await this.hashingService.indexImage({
+        buffer: imageDetails.buffer,
+        originalname: imageDetails.filename,
+        mimetype: imageDetails.contentType || 'image/jpeg',
+      } as Express.Multer.File);
+      console.log('Image indexed.');
+    } catch (error) {
+      this.logger.error(`Indexing failed for tokenId=${tokenId}: ${error.message}`);
+      // Do not throw; mint was successful.
     }
 
     return { status: 'minted', tokenId, tokenUri, imageUri: dto.imageUri, perceptualHash: hash, txHash: tx2.hash };

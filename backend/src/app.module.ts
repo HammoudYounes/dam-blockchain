@@ -5,6 +5,7 @@ import { AppService } from './app.service';
 import { ImageModule } from './image/image.module';
 import { SignatureModule } from './signature/signature.module';
 import { NftModule } from './nft/nft.module';
+import { HashingModule } from './hashing/hashing.module';
 import { AuthModule } from './auth/auth.module';
 import { IpfsModule } from './ipfs/ipfs.module';
 import { BlockchainModule } from './blockchain/blockchain.module';
@@ -17,6 +18,7 @@ import { JwtAuthGuard } from './auth/jwt-auth/jwt-auth.guard';
     ImageModule,
     SignatureModule,
     NftModule,
+    HashingModule,
     AuthModule,
     IpfsModule,
     BlockchainModule,

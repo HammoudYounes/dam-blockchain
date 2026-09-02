@@ -4,12 +4,14 @@ import { of } from 'rxjs';
 import { NftService } from './nft.service';
 import { PinataService } from '../ipfs/pinata.service';
 import { SignatureService } from '../signature/signature.service';
+import { HashingService } from '../hashing/hashing.service';
 import { HttpService } from '@nestjs/axios';
 
 describe('NftService', () => {
   let service: NftService;
   let pinataService: PinataService;
   let signatureService: SignatureService;
+  let hashingService: HashingService;
   let httpService: HttpService;
   let assetContract: any;
   let signatureContract: any;
@@ -49,6 +51,12 @@ describe('NftService', () => {
           },
         },
         {
+          provide: HashingService,
+          useValue: {
+            getSimilarity: jest.fn(),
+          },
+        },
+        {
           provide: HttpService,
           useValue: {
             get: jest.fn().mockReturnValue(
@@ -68,6 +76,7 @@ describe('NftService', () => {
     service = module.get<NftService>(NftService);
     pinataService = module.get<PinataService>(PinataService);
     signatureService = module.get<SignatureService>(SignatureService);
+    hashingService = module.get<HashingService>(HashingService);
     httpService = module.get<HttpService>(HttpService);
   });
 
