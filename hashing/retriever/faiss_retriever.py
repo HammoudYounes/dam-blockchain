@@ -119,6 +119,23 @@ class ImageRetriever:
             if idx != -1
         ]
 
+    def cosine_similarity(self, image1_bytes: bytes, image2_bytes: bytes):
+        emb1 = self.embedder.get_embedding_from_bytes(image1_bytes)
+        emb2 = self.embedder.get_embedding_from_bytes(image2_bytes)
+        
+        # Ensure embeddings are flat
+        emb1 = emb1.flatten()
+        emb2 = emb2.flatten()
+        
+        # Calculate cosine similarity: (a . b) / (||a|| * ||b||)
+        norm_a = np.linalg.norm(emb1)
+        norm_b = np.linalg.norm(emb2)
+        
+        if norm_a == 0 or norm_b == 0:
+            return 0.0
+            
+        return float(np.dot(emb1, emb2) / (norm_a * norm_b))
+
     def evaluate(self, input_folder: str, pause_time: float = 1.0, display_results: bool = True, k: int = 5):
         total_topk_matches = 0
         total_match_distances = 0
