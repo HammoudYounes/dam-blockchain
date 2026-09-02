@@ -40,7 +40,7 @@ describe('ImageService', () => {
   it('should detect duplicate when similarity > 0.70', async () => {
     const mockFile = { buffer: Buffer.from('test'), originalname: 'test.jpg', mimetype: 'image/jpeg' } as Express.Multer.File;
     jest.spyOn(hashingService, 'getSimilarity').mockResolvedValue({
-      similar_images: [{ duplicateProbability: 0.8 }]
+      data: { similar_images: [{ duplicateProbability: 0.8 }] }
     });
     jest.spyOn(pinataService, 'getGatewayUrl').mockReturnValue('url');
     jest.spyOn(pinataService, 'pinFile').mockResolvedValue('cid1');
@@ -48,7 +48,7 @@ describe('ImageService', () => {
     const result = await service.processUploads([mockFile]);
     
     expect(result[0].isDuplicate).toBe(true);
-    expect(result[0].cid).toBe('cid1');
-    expect(result[0].result).toBeDefined();
+    expect(result[0].cid).toBe(null);
+    expect(result[0].result).toBeUndefined();
   });
 });
